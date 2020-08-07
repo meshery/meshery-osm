@@ -1,4 +1,4 @@
-FROM golang:<go_version> as bd
+FROM golang:1.13.7 as bd
 RUN adduser --disabled-login appuser
 WORKDIR /github.com/layer5io/meshery-osm
 ADD . .

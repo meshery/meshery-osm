@@ -1,6 +1,6 @@
 module github.com/layer5io/meshery-osm
 
-go 1.13.7
+go 1.23
 
 require (
 	github.com/golang/protobuf v1.4.2
