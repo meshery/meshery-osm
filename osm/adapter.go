@@ -1,4 +1,4 @@
-// Copyright 2019 Layer5.io
+// Copyright 2020 Layer5, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package <adapter>
+package osm
 
 import (
 	"context"
 	"time"
 
-	"github.com/layer5io/meshery-<adapter>/meshes"
+	"github.com/layer5io/meshery-osm/meshes"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -30,7 +30,7 @@ func (iClient *Client) CreateMeshInstance(_ context.Context, k8sReq *meshes.Crea
 
 // MeshName just returns the name of the mesh the client is representing
 func (iClient *Client) MeshName(context.Context, *meshes.MeshNameRequest) (*meshes.MeshNameResponse, error) {
-	return &meshes.MeshNameResponse{Name: "Consul"}, nil
+	return &meshes.MeshNameResponse{Name: "Open Service Mesh"}, nil
 }
 
 // ApplyRule is a method invoked to apply a particular operation on the mesh in a namespace
@@ -40,9 +40,16 @@ func (iClient *Client) ApplyOperation(ctx context.Context, arReq *meshes.ApplyRu
 
 // SupportedOperations - returns a list of supported operations on the mesh
 func (iClient *Client) SupportedOperations(context.Context, *meshes.SupportedOperationsRequest) (*meshes.SupportedOperationsResponse, error) {
-	result := map[string]string{}
-	for key, op := range supportedOps {
-		result[key] = op.name
+	supportedOpsCount := len(supportedOps)
+	result := make([]*meshes.SupportedOperation, supportedOpsCount)
+	i := 0
+	for k, sp := range supportedOps {
+		result[i] = &meshes.SupportedOperation{
+			Key:      k,
+			Value:    sp.name,
+			Category: sp.opType,
+		}
+		i++
 	}
 	return &meshes.SupportedOperationsResponse{
 		Ops: result,
