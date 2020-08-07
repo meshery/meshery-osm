@@ -16,7 +16,7 @@ docker-run:
 	layer5/meshery-osm
 
 run:
-	DEBUG=true go run main.go
+	DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
 # setup-adapter sets up a new adapter with the given name & port
 setup-adapter:
@@ -24,4 +24,4 @@ setup-adapter:
 	find . -type f -exec sed -i '' -e 's/osm/${ADAPTER}/g' {} +
 	find . -type f -exec sed -i '' -e 's/<port>/${PORT}/g' {} +
 	find . -type f -exec sed -i '' -e 's/<go_version>/${GO_VERSION}/g' {} +
-	
+
