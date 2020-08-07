@@ -1,3 +1,7 @@
+.vscode
+
+log.txt
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -11,8 +15,43 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-.vscode
+.DS_Store
 
-meshery-<adapter>
+.vscode/
+
+config
+
+*.config
+
+Chart.min.js
+
+fortio_chart.js
+
+**/node_modules/
+
+**/out/
+
+**/.next/
+
+cmd/meshery
 
 log.txt
+
+**/_site
+**/.sass-cache
+**/.jekyll-metadata
+**/.jekyll-cache
+
+dist/
+
+*/npm-debug.log
+
+Gemfile.lock
+
+**/.idea
+docs/Gemfile.lock
+
+yarn.lock
+
+# Generated binaries
+**/bin
