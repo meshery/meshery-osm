@@ -11,16 +11,14 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3564/badge)](https://bestpractices.coreinfrastructure.org/projects/3564)
 
 # Meshery Adapter for Open Service Mesh
-
-<div style="clear:both;
-  display: inline-block;
-  vertical-align: middle;">
-  <h2><a href="https://layer5.io/meshery">Open Service Mesh</a></h2>
-<a href="https://openservicemesh.io"><img src="img/readme/osm.svg"
-style="margin:10px;" width="125px" 
-alt="Open Service Mesh" align="left" /></a>
+<h2><a href="https://meshery.layer5.io/docs">Open Service Mesh</a></h2>
+<a href="https://openservicemesh.io">
+ <img src="img/readme/osm.svg" style="margin:10px;" width="125px" 
+   alt="Open Service Mesh" align="left" />
+</a>
+<p style="height:150px">
 <a href="https://openservicemesh.io">Open Service Mesh</a> (OSM) is a lightweight and extensible cloud native service mesh.
-</div>
+</p>
 
 <p style="clear:both;">
 <h2><a href="https://layer5.io/meshery">Meshery</a></h2>
