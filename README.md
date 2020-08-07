@@ -13,7 +13,7 @@
 # Meshery Adapter for Open Service Mesh
 
 <div style="clear:both;
-  display: inline-block;
+  display: block; height:150px;
   vertical-align: middle;">
   <h2><a href="https://layer5.io/meshery">Open Service Mesh</a></h2>
 <a href="https://openservicemesh.io"><img src="img/readme/osm.svg"
