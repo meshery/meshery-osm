@@ -1,7 +1,5 @@
 <p style="text-align:center;" align="center"><a href="https://layer5.io/meshery"><img align="center" style="margin-bottom:20px;" src="https://raw.githubusercontent.com/layer5io/layer5/master/assets/images/meshery/meshery-logo-tag-light-text-side.png"  width="70%" /></a><br /><br /></p>
  
-# Meshery Adapter for Open Service Mesh
-
 [![Docker Pulls](https://img.shields.io/docker/pulls/layer5/meshery-osm.svg)](https://hub.docker.com/r/layer5/meshery-osm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/layer5io/meshery-osm)](https://goreportcard.com/report/github.com/layer5io/meshery-osm)
 [![Build Status](https://github.com/layer5io/meshery-osm/workflows/Meshery-osm/badge.svg)](https://github.com/layer5io/meshery-osm/actions)
@@ -11,9 +9,13 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/layer5.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mesheryio)
 [![Slack](http://slack.layer5.io/badge.svg)](http://slack.layer5.io)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3564/badge)](https://bestpractices.coreinfrastructure.org/projects/3564)
-<div style="
+
+# Meshery Adapter for Open Service Mesh
+
+<div style="clear:both;
   display: inline-block;
   vertical-align: middle;">
+  <h2><a href="https://layer5.io/meshery">Open Service Mesh</a></h2>
 <a href="https://openservicemesh.io"><img src="img/readme/osm.svg"
 style="margin:10px;" width="125px" 
 alt="Open Service Mesh" align="left" /></a>
