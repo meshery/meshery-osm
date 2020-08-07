@@ -12,13 +12,12 @@
 
 # Meshery Adapter for Open Service Mesh
 
-<div style="clear:both;
-  display: block; height:150px;
-  vertical-align: middle;">
-  <h2><a href="https://layer5.io/meshery">Open Service Mesh</a></h2>
-<a href="https://openservicemesh.io"><img src="img/readme/osm.svg"
-style="margin:10px;" width="125px" 
-alt="Open Service Mesh" align="left" /></a>
+<div style="display: block; height:250px; vertical-align: middle;">
+<h2><a href="https://meshery.layer5.io/docs">Open Service Mesh</a></h2>
+<a href="https://openservicemesh.io">
+ <img src="img/readme/osm.svg" style="margin:10px;" width="125px" 
+   alt="Open Service Mesh" align="left" />
+</a>
 <a href="https://openservicemesh.io">Open Service Mesh</a> (OSM) is a lightweight and extensible cloud native service mesh.
 </div>
 
