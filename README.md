@@ -11,6 +11,14 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/layer5.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=mesheryio)
 [![Slack](http://slack.layer5.io/badge.svg)](http://slack.layer5.io)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3564/badge)](https://bestpractices.coreinfrastructure.org/projects/3564)
+<div style="
+  display: inline-block;
+  vertical-align: middle;">
+<a href="https://openservicemesh.io"><img src="img/readme/osm.svg"
+style="margin:10px;" width="125px" 
+alt="Open Service Mesh" align="left" /></a>
+<a href="https://openservicemesh.io">Open Service Mesh</a> (OSM) is a lightweight and extensible cloud native service mesh.
+</div>
 
 <p style="clear:both;">
 <h2><a href="https://layer5.io/meshery">Meshery</a></h2>
