@@ -6,22 +6,22 @@ proto:
 	protoc -I meshes/ meshes/meshops.proto --go_out=plugins=grpc:./meshes/
 
 docker:
-	docker build -t layer5/meshery-<adapter> .
+	docker build -t layer5/meshery-osm .
 
 docker-run:
-	(docker rm -f meshery-<adapter>) || true
-	docker run --name meshery-<adapter> -d \
-	-p <port>:<port> \
+	(docker rm -f meshery-osm) || true
+	docker run --name meshery-osm -d \
+	-p 10010:10010 \
 	-e DEBUG=true \
-	layer5/meshery-<adapter>
+	layer5/meshery-osm
 
 run:
-	DEBUG=true go run main.go
+	DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
 # setup-adapter sets up a new adapter with the given name & port
 setup-adapter:
-	mv "<adapter>" ${ADAPTER}
-	find . -type f -exec sed -i '' -e 's/<adapter>/${ADAPTER}/g' {} +
+	mv "osm" ${ADAPTER}
+	find . -type f -exec sed -i '' -e 's/osm/${ADAPTER}/g' {} +
 	find . -type f -exec sed -i '' -e 's/<port>/${PORT}/g' {} +
 	find . -type f -exec sed -i '' -e 's/<go_version>/${GO_VERSION}/g' {} +
-	
+

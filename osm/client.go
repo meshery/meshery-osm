@@ -1,4 +1,4 @@
-// Copyright 2019 Layer5.io
+// Copyright 2020 Layer5, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package <adapter>
+package osm
 
-type supportedOperation struct {
-	// a friendly name
-	name string
-	// the template file name
-	templateName string
-}
+import "github.com/layer5io/meshery-osm/meshes"
 
-const (
-	customOpCommand = "custom"
-)
-
-var supportedOps = map[string]supportedOperation{
-	customOpCommand: {
-		name: "Custom YAML",
-	},
+// Client represents an osm client in Meshery
+type Client struct {
+	eventChan chan *meshes.EventsResponse
 }

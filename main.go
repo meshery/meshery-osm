@@ -1,4 +1,4 @@
-// Copyright 2019 Layer5.io
+// Copyright 2020 Layer5, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/layer5io/meshery-<adapter>/<adapter>"
-	mesh "github.com/layer5io/meshery-<adapter>/meshes"
+	mesh "github.com/layer5io/meshery-osm/meshes"
+	"github.com/layer5io/meshery-osm/osm"
 )
 
 var (
-	gRPCPort = flag.Int("grpc-port", <port>, "The gRPC server port")
+	gRPCPort = flag.Int("grpc-port", 10010, "The gRPC server port")
 )
 
 var log grpclog.LoggerV2
@@ -55,7 +55,7 @@ func main() {
 	s := grpc.NewServer(
 	// grpc.Creds(credentials.NewServerTLSFromCert(&insecure.Cert)),
 	)
-	mesh.RegisterMeshServiceServer(s, &<adapter>.Client{})
+	mesh.RegisterMeshServiceServer(s, &osm.Client{})
 
 	// Serve gRPC Server
 	logrus.Infof("Serving gRPC on %s", addr)
