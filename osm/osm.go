@@ -23,6 +23,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// CreateMeshInstance creates an instance of the mesh on the cluster
 func (iClient *Client) CreateMeshInstance(_ context.Context, k8sReq *meshes.CreateMeshInstanceRequest) (*meshes.CreateMeshInstanceResponse, error) {
 	iClient.eventChan = make(chan *meshes.EventsResponse, 100)
 	return &meshes.CreateMeshInstanceResponse{}, nil
@@ -33,7 +34,7 @@ func (iClient *Client) MeshName(context.Context, *meshes.MeshNameRequest) (*mesh
 	return &meshes.MeshNameResponse{Name: "Open Service Mesh"}, nil
 }
 
-// ApplyRule is a method invoked to apply a particular operation on the mesh in a namespace
+// ApplyOperation is a method invoked to apply a particular operation on the mesh in a namespace
 func (iClient *Client) ApplyOperation(ctx context.Context, arReq *meshes.ApplyRuleRequest) (*meshes.ApplyRuleResponse, error) {
 	return &meshes.ApplyRuleResponse{}, nil
 }

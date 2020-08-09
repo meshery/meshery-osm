@@ -9,17 +9,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// ConformanceResponse holds the response object of the test
 type ConformanceResponse struct {
 	Tests    string                       `json:"tests,omitempty"`
 	Failures string                       `json:"failures,omitempty"`
 	Results  []*SingleConformanceResponse `json:"results,omitempty"`
 }
 
+// Failure is the failure response object
 type Failure struct {
 	Text    string `json:"text,omitempty"`
 	Message string `json:"message,omitempty"`
 }
 
+// SingleConformanceResponse holds the result of one particular test case
 type SingleConformanceResponse struct {
 	Name       string   `json:"name,omitempty"`
 	Time       string   `json:"time,omitempty"`
