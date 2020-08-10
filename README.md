@@ -2,7 +2,7 @@
  
 [![Docker Pulls](https://img.shields.io/docker/pulls/layer5/meshery-osm.svg)](https://hub.docker.com/r/layer5/meshery-osm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/layer5io/meshery-osm)](https://goreportcard.com/report/github.com/layer5io/meshery-osm)
-[![Build Status](https://github.com/layer5io/meshery-osm/workflows/Meshery-osm/badge.svg)](https://github.com/layer5io/meshery-osm/actions)
+[![Build Status](https://github.com/layer5io/meshery-osm/workflows/Meshery OSM/badge.svg)](https://github.com/layer5io/meshery-osm/actions)
 [![GitHub](https://img.shields.io/github/license/layer5io/meshery-osm.svg)](LICENSE)
 [![GitHub issues by-label](https://img.shields.io/github/issues/layer5io/meshery-osm/help%20wanted.svg)](https://github.com/layer5io/meshery-osm/issues?q=is%3Aopen+is%3Aissue+label%3A"help+wanted")
 [![Website](https://img.shields.io/website/https/layer5.io/meshery.svg)](https://layer5.io/meshery/)
