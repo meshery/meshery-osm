@@ -31,12 +31,7 @@ type SingleConformanceResponse struct {
 }
 
 func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.ApplyRuleRequest) error {
-	annotations := make(map[string]string, 0)
-	// err := json.Unmarshal([]byte(arReq.CustomBody), &annotations)
-	// if err != nil {
-	// 	logrus.Error(err)
-	// 	return errors.Wrapf(err, "Error unmarshaling annotation body.")
-	// }
+	annotations := make(map[string]string)
 
 	go func(name string, a map[string]string, req *meshes.ApplyRuleRequest) {
 
@@ -105,9 +100,6 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 			Summary:     fmt.Sprintf("Tests Results: %+v", response),
 			Details:     "Test completed successfully",
 		}
-
-		// _ = cClient.Close()
-		return
 
 	}(adaptorname, annotations, arReq)
 
