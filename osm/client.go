@@ -205,7 +205,7 @@ func createKubeconfig(kubeconfig []byte, contextName string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", user.HomeDir, kubeconfigpath), d, 0644)
+	err = ioutil.WriteFile(fmt.Sprintf("%s/%s", user.HomeDir, kubeconfigpath), d, 0600)
 	if err != nil {
 		return err
 	}
