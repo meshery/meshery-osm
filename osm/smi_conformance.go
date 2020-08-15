@@ -37,6 +37,7 @@ type SingleConformanceResponse struct {
 	Failure    *Failure `json:"failure,omitempty"`
 }
 
+// installConformanceTool installs the smi conformance tool
 func (iClient *Client) installConformanceTool(req *meshes.ApplyRuleRequest) error {
 	Executable, err := exec.LookPath("./scripts/create_smi.sh")
 	if err != nil {
@@ -72,6 +73,7 @@ func (iClient *Client) installConformanceTool(req *meshes.ApplyRuleRequest) erro
 	return nil
 }
 
+// deleteConformanceTool deletes the smi conformance tool
 func (iClient *Client) deleteConformanceTool(req *meshes.ApplyRuleRequest) error {
 	Executable, err := exec.LookPath("./scripts/delete_smi.sh")
 	if err != nil {
@@ -104,6 +106,7 @@ func (iClient *Client) deleteConformanceTool(req *meshes.ApplyRuleRequest) error
 	return nil
 }
 
+// startConformanceTool initiates the connection
 func (iClient *Client) startConformanceTool(ctx context.Context) error {
 	svc, err := iClient.k8sClientset.CoreV1().Services("meshery").Get(ctx, "smi-conformance", metav1.GetOptions{})
 	if err != nil {
@@ -113,6 +116,7 @@ func (iClient *Client) startConformanceTool(ctx context.Context) error {
 	return nil
 }
 
+// runConformanceTest runs the conformance test
 func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.ApplyRuleRequest) error {
 	annotations := make(map[string]string, 0)
 	labels := map[string]string{
@@ -191,8 +195,6 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 		Summary:     "Test completed successfully",
 		Details:     fmt.Sprintf("Tests Results: %s\n", string(jsondata)),
 	}
-
-	cClient.Close()
 
 	return nil
 }

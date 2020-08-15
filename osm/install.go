@@ -15,6 +15,7 @@ var (
 	}
 )
 
+// installMesh installs the mesh
 func (iClient *Client) installMesh(method string, version string) error {
 
 	if _, ok := releases[version]; !ok {
@@ -30,6 +31,7 @@ func (iClient *Client) installMesh(method string, version string) error {
 	return nil
 }
 
+// applyOSM applies mesh resources with osmctl
 func applyOSM(version string) error {
 	Executable, err := exec.LookPath("./scripts/osmctl.sh")
 	if err != nil {

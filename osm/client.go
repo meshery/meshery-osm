@@ -52,6 +52,7 @@ type Client struct {
 	smiAddress string
 }
 
+// Kubeconfig is structure of the kubeconfig file
 type Kubeconfig struct {
 	APIVersion string `yaml:"apiVersion,omitempty"`
 	Clusters   []struct {
@@ -103,6 +104,7 @@ type Kubeconfig struct {
 	} `yaml:"users,omitempty"`
 }
 
+// configClient creates a config client
 func configClient(kubeconfig []byte, contextName string) (*rest.Config, error) {
 	if len(kubeconfig) > 0 {
 		ccfg, err := clientcmd.Load(kubeconfig)
@@ -118,6 +120,7 @@ func configClient(kubeconfig []byte, contextName string) (*rest.Config, error) {
 	return rest.InClusterConfig()
 }
 
+// newClient creates a new client
 func newClient(kubeconfig []byte, contextName string) (*Client, error) {
 	kubeconfig = monkeyPatchingToSupportInsecureConn(kubeconfig)
 	client := Client{}
@@ -144,6 +147,7 @@ func newClient(kubeconfig []byte, contextName string) (*Client, error) {
 	return &client, nil
 }
 
+// monkeyPatchingToSupportInsecureConn support for insecure conn
 func monkeyPatchingToSupportInsecureConn(data []byte) []byte {
 	config := map[string]interface{}{}
 	if err := yaml.Unmarshal(data, &config); err != nil {
@@ -180,6 +184,7 @@ func monkeyPatchingToSupportInsecureConn(data []byte) []byte {
 	return data1
 }
 
+// createKubeconfig creates kubeconfig in local container
 func createKubeconfig(kubeconfig []byte, contextName string) error {
 
 	yamlConfig := Kubeconfig{}
