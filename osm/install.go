@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Versions of the Service Mesh
 var (
 	releases = map[string]struct{}{
 		"v0.2.0": struct{}{},
@@ -22,6 +23,7 @@ func (iClient *Client) installMesh(method string, version string) error {
 		return errors.New(fmt.Sprintf("version %s unavailable", version))
 	}
 
+	// Install Method: Using Service Mesh-specific CLI
 	switch method {
 	case "osmctl":
 		if err := applyOSM(version); err != nil {
