@@ -26,6 +26,7 @@ type supportedOperation struct {
 
 const (
 	customOpCommand       = "custom"
+	installOSMCommand     = "installOSM"
 	smiConformanceCommand = "smiConformanceTest"
 )
 
@@ -36,5 +37,9 @@ var supportedOps = map[string]supportedOperation{
 	smiConformanceCommand: {
 		name:   "Run SMI conformance test",
 		opType: meshes.OpCategory_VALIDATE,
+	},
+	installOSMCommand: {
+		name:   "Install Open service mesh in the cluster",
+		opType: meshes.OpCategory_INSTALL,
 	},
 }
