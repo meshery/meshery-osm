@@ -121,7 +121,7 @@ func (iClient *Client) ApplyOperation(_ context.Context, arReq *meshes.ApplyRule
 				return
 			}
 
-			err = iClient.startConformanceTool(context.TODO())
+			err = iClient.connectConformanceTool(context.TODO())
 			if err != nil {
 				iClient.eventChan <- &meshes.EventsResponse{
 					OperationId: arReq.OperationId,

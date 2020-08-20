@@ -46,10 +46,10 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: "1"
+            cpu: "500m"
             memory: 1000Mi
           requests:
-            cpu: "500m"
+            cpu: "200m"
             memory: 500Mi
       restartPolicy: Always
       serviceAccount: meshery
@@ -63,10 +63,11 @@ metadata:
   labels:
     app: smi-conformance
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - name: smi-conformance
     port: 10008
+    targetPort: 10008
     protocol: TCP 
   selector:
     app: smi-conformance 
