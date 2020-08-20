@@ -57,8 +57,4 @@ if ! ./$OS-$OSM_ARCH/osm install; then
 fi
 printf "INFO\tDeployment successfull!!\n"
 
-if ! rm -rf $OS-$OSM_ARCH; then
-	printf "ERROR\tUnable to clear temperory files!"
-fi
-
 printf "INFO\tOpen service mesh has been installed successfully!!\n"

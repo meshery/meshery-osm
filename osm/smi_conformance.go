@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"time"
@@ -106,19 +107,44 @@ func (iClient *Client) deleteConformanceTool(req *meshes.ApplyRuleRequest) error
 	return nil
 }
 
-// startConformanceTool initiates the connection
-func (iClient *Client) startConformanceTool(ctx context.Context) error {
+// connectConformanceTool initiates the connection
+func (iClient *Client) connectConformanceTool(ctx context.Context) error {
+	var host string
+	var port int32
+
 	svc, err := iClient.k8sClientset.CoreV1().Services("meshery").Get(ctx, "smi-conformance", metav1.GetOptions{})
 	if err != nil {
 		return errors.New("Unable to get service: " + err.Error())
 	}
 
-	host := svc.Status.LoadBalancer.Ingress[0].IP
-	if host == "127.0.0.1" {
-		host = "minikubeCA"
+	nodes, err := iClient.k8sClientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return errors.New("Unable to get nodes: " + err.Error())
 	}
-	iClient.smiAddress = fmt.Sprintf("%s:%d", host, svc.Spec.Ports[0].Port)
+	addresses := make(map[string]string, 0)
+	for _, addr := range nodes.Items[0].Status.Addresses {
+		addresses[string(addr.Type)] = addr.Address
+	}
+	host = addresses["ExternalIP"]
+	port = svc.Spec.Ports[0].NodePort
+	if tcpCheck(addresses["InternalIP"], port) {
+		host = addresses["InternalIP"]
+	}
+
+	iClient.smiAddress = fmt.Sprintf("%s:%d", host, port)
 	return nil
+}
+
+func tcpCheck(ip string, port int32) bool {
+	timeout := 5 * time.Second
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), timeout)
+	if err != nil {
+		return false
+	}
+	if conn != nil {
+		return true
+	}
+	return false
 }
 
 // runConformanceTest runs the conformance test
@@ -136,14 +162,9 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 	cClient, err := conformance.CreateClient(context.TODO(), iClient.smiAddress)
 	if err != nil {
 		logrus.Error(err)
-		iClient.eventChan <- &meshes.EventsResponse{
-			OperationId: arReq.OperationId,
-			EventType:   meshes.EventType_ERROR,
-			Summary:     "Error creating a smi conformance tool client.",
-			Details:     err.Error(),
-		}
 		return err
 	}
+	defer cClient.Close()
 	logrus.Debugf("created client for smi conformance tool: %s", adaptorname)
 
 	result, err := cClient.CClient.RunTest(context.TODO(), &conformance.Request{
@@ -153,12 +174,6 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 	})
 	if err != nil {
 		logrus.Error(err)
-		iClient.eventChan <- &meshes.EventsResponse{
-			OperationId: arReq.OperationId,
-			EventType:   meshes.EventType_ERROR,
-			Summary:     "Test failed",
-			Details:     err.Error(),
-		}
 		return err
 	}
 	logrus.Debugf("Tests ran successfully for smi conformance tool!!")
