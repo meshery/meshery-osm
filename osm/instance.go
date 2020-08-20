@@ -67,7 +67,7 @@ func applyOSM(version string) error {
 }
 
 // deleteOSM deletes mesh resources with osmctl
-func deleteOSM(version string) error {
+func deleteOSM() error {
 	Executable, err := exec.LookPath("./scripts/delete_osmctl.sh")
 	if err != nil {
 		return err
