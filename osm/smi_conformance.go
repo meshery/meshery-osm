@@ -112,7 +112,12 @@ func (iClient *Client) startConformanceTool(ctx context.Context) error {
 	if err != nil {
 		return errors.New("Unable to get service: " + err.Error())
 	}
-	iClient.smiAddress = fmt.Sprintf("%s:%d", svc.Status.LoadBalancer.Ingress[0].IP, svc.Spec.Ports[0].Port)
+
+	host := svc.Status.LoadBalancer.Ingress[0].IP
+	if host == "127.0.0.1" {
+		host = "minikubeCA"
+	}
+	iClient.smiAddress = fmt.Sprintf("%s:%d", host, svc.Spec.Ports[0].Port)
 	return nil
 }
 
