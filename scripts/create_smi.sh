@@ -12,4 +12,4 @@ if ! kubectl apply -f ./scripts/smi-conformance.yaml; then
 	printf "ERROR\tUnable to deploy\n"
 	exit 1
 fi
-printf "INFO\tSMI Deployment successfull!!\n"
+printf "INFO\tSMI Deployment successfull\n"

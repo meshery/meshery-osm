@@ -84,7 +84,7 @@ func (iClient *Client) ApplyOperation(_ context.Context, arReq *meshes.ApplyRule
 			if arReq.DeleteOp {
 				opName = "removing"
 			}
-			if err := iClient.installMesh("osmctl", "v0.3.0"); err != nil {
+			if err := iClient.installMesh("osmctl", "v0.3.0", arReq.DeleteOp); err != nil {
 				iClient.eventChan <- &meshes.EventsResponse{
 					OperationId: arReq.OperationId,
 					EventType:   meshes.EventType_ERROR,
