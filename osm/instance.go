@@ -20,7 +20,7 @@ var (
 func (iClient *Client) installMesh(method string, version string, deleteOp bool) error {
 
 	if deleteOp {
-		return deleteOSM()
+		return deleteOSM(version)
 	}
 
 	if _, ok := releases[version]; !ok {
@@ -67,7 +67,7 @@ func applyOSM(version string) error {
 }
 
 // deleteOSM deletes mesh resources with osmctl
-func deleteOSM() error {
+func deleteOSM(version string) error {
 	Executable, err := exec.LookPath("./scripts/delete_osmctl.sh")
 	if err != nil {
 		return err
@@ -79,6 +79,9 @@ func deleteOSM() error {
 		Stdout: os.Stdout,
 		Stderr: os.Stdout,
 	}
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("OSM_VERSION=%s", version),
+	)
 
 	err = cmd.Start()
 	if err != nil {
