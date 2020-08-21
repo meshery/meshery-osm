@@ -58,7 +58,7 @@ func (iClient *Client) CreateMeshInstance(_ context.Context, k8sReq *meshes.Crea
 
 // MeshName just returns the name of the mesh the client is representing
 func (iClient *Client) MeshName(context.Context, *meshes.MeshNameRequest) (*meshes.MeshNameResponse, error) {
-	return &meshes.MeshNameResponse{Name: "OSM"}, nil
+	return &meshes.MeshNameResponse{Name: "Open Service Mesh"}, nil
 }
 
 // ApplyOperation is a method invoked to apply a particular operation on the mesh in a namespace
