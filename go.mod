@@ -8,7 +8,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.9.0 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gophercloud/gophercloud v0.4.0 // indirect
-	github.com/layer5io/learn-layer5/smi-conformance v0.0.0-20200813212240-2e4b7a7e231a
+	github.com/layer5io/learn-layer5/smi-conformance v0.0.0-20200825001854-9c91a3207028
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381

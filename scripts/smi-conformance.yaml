@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
       - name: smi-conformance
-        image: layer5/learn-layer5:smi-v0.4.5
+        image: layer5/learn-layer5:smi-v0.4.7
         imagePullPolicy: Always
         name: smi-conformance
         ports:
