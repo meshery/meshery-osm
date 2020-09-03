@@ -35,11 +35,11 @@ var supportedOps = map[string]supportedOperation{
 		name: "Custom YAML",
 	},
 	smiConformanceCommand: {
-		name:   "Run SMI conformance test",
+		name:   "SMI conformance test",
 		opType: meshes.OpCategory_VALIDATE,
 	},
 	installOSMCommand: {
-		name:   "Install Open service mesh in the cluster",
+		name:   "Open service mesh in the cluster",
 		opType: meshes.OpCategory_INSTALL,
 	},
 }

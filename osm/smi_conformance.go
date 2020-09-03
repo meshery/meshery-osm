@@ -176,7 +176,7 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 		logrus.Error(err)
 		return err
 	}
-	logrus.Debugf("Tests ran successfully for smi conformance tool!!")
+	logrus.Debugf("Tests ran successfully for smi conformance tool")
 
 	response := ConformanceResponse{
 		Tests:    result.Tests,
@@ -188,8 +188,8 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 		iClient.eventChan <- &meshes.EventsResponse{
 			OperationId: arReq.OperationId,
 			EventType:   meshes.EventType_ERROR,
-			Summary:     "SMI tool connection crashed!",
-			Details:     "Smi-conformance tool unreachable",
+			Summary:     "SMI tool connection crashed",
+			Details:     "Tool unreachable",
 		}
 		return err
 	}
@@ -212,7 +212,7 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 	iClient.eventChan <- &meshes.EventsResponse{
 		OperationId: arReq.OperationId,
 		EventType:   meshes.EventType_INFO,
-		Summary:     "Test completed successfully",
+		Summary:     "SMI conformance test completed successfully",
 		Details:     fmt.Sprintf("Tests Results: %s\n", string(jsondata)),
 	}
 
