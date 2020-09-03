@@ -164,7 +164,6 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 		logrus.Error(err)
 		return err
 	}
-	defer cClient.Close()
 	logrus.Debugf("created client for smi conformance tool: %s", adaptorname)
 
 	result, err := cClient.CClient.RunTest(context.TODO(), &conformance.Request{
@@ -214,6 +213,11 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 		EventType:   meshes.EventType_INFO,
 		Summary:     "SMI conformance test completed successfully",
 		Details:     fmt.Sprintf("Tests Results: %s\n", string(jsondata)),
+	}
+
+	err = cClient.Close()
+	if err != nil {
+		return err
 	}
 
 	return nil
