@@ -11,7 +11,7 @@ docker:
 docker-run:
 	(docker rm -f meshery-osm) || true
 	docker run --name meshery-osm -d \
-	-p 10010:10010 \
+	-p 10009:10009 \
 	-e DEBUG=true \
 	layer5/meshery-osm
 
