@@ -19,10 +19,11 @@ categories:
     label: area/docs 
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 template: |
-  ## What's new ?
+  ## What's New
+  **General**
   $CHANGES
   
   ## Contributors
   
-  Thanks a lot to our contributors for making this release possible:
+  Thank you to our contributors for making this release possible:
   $CONTRIBUTORS
