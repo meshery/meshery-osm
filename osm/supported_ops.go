@@ -32,14 +32,14 @@ const (
 
 var supportedOps = map[string]supportedOperation{
 	customOpCommand: {
-		name: "Custom YAML",
+		name: "Apply Custom Service Mesh or Kubernetes Configuration",
 	},
 	smiConformanceCommand: {
-		name:   "SMI conformance test",
+		name:   "SMI Conformance Test",
 		opType: meshes.OpCategory_VALIDATE,
 	},
 	installOSMCommand: {
-		name:   "Open service mesh in the cluster",
+		name:   "Install Open Service Mesh in a Kubernetes cluster",
 		opType: meshes.OpCategory_INSTALL,
 	},
 }
