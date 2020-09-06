@@ -64,7 +64,7 @@ func (iClient *Client) installConformanceTool(req *meshes.ApplyRuleRequest) erro
 	iClient.eventChan <- &meshes.EventsResponse{
 		OperationId: req.OperationId,
 		EventType:   meshes.EventType_INFO,
-		Summary:     "SMI tool installed successfully",
+		Summary:     "SMI conformance tests initiated.",
 		Details:     " ",
 	}
 
@@ -100,7 +100,7 @@ func (iClient *Client) deleteConformanceTool(req *meshes.ApplyRuleRequest) error
 	iClient.eventChan <- &meshes.EventsResponse{
 		OperationId: req.OperationId,
 		EventType:   meshes.EventType_INFO,
-		Summary:     "SMI tool deleted successfully",
+		Summary:     "SMI conformance test cleaned up.",
 		Details:     " ",
 	}
 
@@ -187,8 +187,8 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 		iClient.eventChan <- &meshes.EventsResponse{
 			OperationId: arReq.OperationId,
 			EventType:   meshes.EventType_ERROR,
-			Summary:     "SMI tool connection crashed",
-			Details:     "Tool unreachable",
+			Summary:     "Disconnected from SMI conformance tests.",
+			Details:     "The set of SMI conformance tets has become unreachable. Use `mesheryctl system logs` to inspect this issue.",
 		}
 		return err
 	}
@@ -211,7 +211,7 @@ func (iClient *Client) runConformanceTest(adaptorname string, arReq *meshes.Appl
 	iClient.eventChan <- &meshes.EventsResponse{
 		OperationId: arReq.OperationId,
 		EventType:   meshes.EventType_INFO,
-		Summary:     "SMI conformance test completed successfully",
+		Summary:     "SMI conformance tests completed successfully",
 		Details:     fmt.Sprintf("Tests Results: %s\n", string(jsondata)),
 	}
 
