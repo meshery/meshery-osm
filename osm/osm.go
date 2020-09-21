@@ -110,47 +110,8 @@ func (iClient *Client) ApplyOperation(_ context.Context, arReq *meshes.ApplyRule
 		}, nil
 	case smiConformanceCommand:
 		go func() {
-			err := iClient.installConformanceTool(arReq)
+			err := iClient.validateSMIConformance(arReq.OperationId, "v0.3.0")
 			if err != nil {
-				iClient.eventChan <- &meshes.EventsResponse{
-					OperationId: arReq.OperationId,
-					EventType:   meshes.EventType_ERROR,
-					Summary:     "Error while installing Conformance tool",
-					Details:     err.Error(),
-				}
-				return
-			}
-
-			err = iClient.connectConformanceTool(context.TODO())
-			if err != nil {
-				iClient.eventChan <- &meshes.EventsResponse{
-					OperationId: arReq.OperationId,
-					EventType:   meshes.EventType_ERROR,
-					Summary:     "Error while connecting to Conformance tool",
-					Details:     err.Error(),
-				}
-				return
-			}
-
-			err = iClient.runConformanceTest("osm", arReq)
-			if err != nil {
-				iClient.eventChan <- &meshes.EventsResponse{
-					OperationId: arReq.OperationId,
-					EventType:   meshes.EventType_ERROR,
-					Summary:     "Error while running Conformance tool",
-					Details:     err.Error(),
-				}
-				return
-			}
-
-			err = iClient.deleteConformanceTool(arReq)
-			if err != nil {
-				iClient.eventChan <- &meshes.EventsResponse{
-					OperationId: arReq.OperationId,
-					EventType:   meshes.EventType_ERROR,
-					Summary:     "Error while deleting Conformance tool",
-					Details:     err.Error(),
-				}
 				return
 			}
 		}()
