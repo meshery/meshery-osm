@@ -2,149 +2,148 @@ name: Meshery OSM
 on:
   push:
     branches:
-      - "*"
+      - 'master'
     tags:
-      - "v*"
+      - 'v*'
   pull_request:
     branches:
-      - master
+      - 'master'
+
 jobs:
-  lint:
-    name: Check & Review code
+  golangci:
+    name: golangci-lint
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@master
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
         with:
-          fetch-depth: 1
-      - name: Setup Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ secrets.GO_VERSION }}
-      - run: GOPROXY=direct GOSUMDB=off go get -u golang.org/x/lint/golint; go list ./osm/... | grep -v /vendor/ | xargs -L1 /home/runner/go/bin/golint -set_exit_status
-  error_check:
-    name: Error check
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: v1.29
+
+          # Optional: working directory, useful for monorepos
+          # working-directory: somedir
+
+          # Optional: golangci-lint command line arguments.
+          # args: --issues-exit-code=0
+
+          # Optional: show only new issues if it's a pull request. The default value is `false`.
+          # only-new-issues: true
+  server-tests:
+    needs: [tests-ui, golangci, build-backend, build-ui]
+    name: Server tests
     runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 1
-      - name: Setup Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ secrets.GO_VERSION }}
-      - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go get -u github.com/kisielk/errcheck; /home/runner/go/bin/errcheck -tags draft ./...
-  static_check:
-    name: Static check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 1
-      - name: Setup Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ secrets.GO_VERSION }}
-          # todo(kush) fix nullpointer differencing which are ignored due to build failure in PR https://github.com/layer5io/meshery-osm/pull/21 (Check to be removed S1019,SA5011,S1023)
-      - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go get honnef.co/go/tools/cmd/staticcheck; /home/runner/go/bin/staticcheck -tags draft -checks all,-ST1003,-ST1000,-U1000,-S1019,-SA5011,-S1023 ./... # https://staticcheck.io/docs/checks
-  vet:
-    name: Vet
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 1
-      - name: Setup Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ secrets.GO_VERSION }}
-      - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go vet -tags draft ./...
-  sec_check:
-    name: Security check
-    runs-on: ubuntu-latest
-    env:
-      GO111MODULE: on
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
-        with:
-          args: ./... -exclude=G301,G304,G107,G101,G110
-  tests:
-    #  needs: [lint, error_check, static_check, vet, sec_check]
-     name: Tests
-     runs-on: ubuntu-latest
-     steps:
-     - name: Check out code
-       uses: actions/checkout@master
-       with:
-        fetch-depth: 1
-     - name: Setup Go
-       uses: actions/setup-go@v1
-       with:
-        go-version: ${{ secrets.GO_VERSION }}
-     - name: Create cluster using KinD
-       uses: engineerd/setup-kind@v0.3.0
-       with:
-         version: "v0.7.0"
-     - run: |
-         export CURRENTCONTEXT="$(kubectl config current-context)"
-         echo "current-context:" ${CURRENTCONTEXT}   
-         export KUBECONFIG="${HOME}/.kube/config"
-         echo "environment-kubeconfig:" ${KUBECONFIG}
-         GOPROXY=direct GOSUMDB=off GO111MODULE=on go test ./...
-  build:
-    name: Build check
-    runs-on: ubuntu-latest
-    # needs: [lint, error_check, static_check, vet, sec_check, tests]
-    steps:
-      - name: Check out code
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 1
-      - name: Setup Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ secrets.GO_VERSION }}
-      - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go build .
-  docker:
-    name: Docker build and push
-    runs-on: ubuntu-latest
-    #needs: [build_release]
     steps:
     - name: Check out code
-      if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
       uses: actions/checkout@master
       with:
         fetch-depth: 1
-    - name: Docker login
-      if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
-      uses: azure/docker-login@v1
+    - name: Setup Go
+      uses: actions/setup-go@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    - name: Docker build & tag
-      if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
-      run: |
-        DOCKER_BUILDKIT=1 docker build --no-cache -t ${{ secrets.IMAGE_NAME }}:stable-latest --build-arg TOKEN=${{ secrets.GLOBAL_TOKEN }} --build-arg GIT_COMMITSHA=${GITHUB_SHA::7} --build-arg GIT_VERSION=${GITHUB_REF/refs\/tags\//} .
-        docker tag ${{ secrets.IMAGE_NAME }}:stable-latest ${{ secrets.IMAGE_NAME }}:stable-${GITHUB_REF/refs\/tags\//}
-        docker tag ${{ secrets.IMAGE_NAME }}:stable-latest ${{ secrets.IMAGE_NAME }}:stable-${GITHUB_SHA::7}
-    - name: Docker push
-      if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
-      run: |
-        docker push ${{ secrets.IMAGE_NAME }}:stable-latest
-        docker push ${{ secrets.IMAGE_NAME }}:stable-${GITHUB_REF/refs\/tags\//}
-        docker push ${{ secrets.IMAGE_NAME }}:stable-${GITHUB_SHA::7}
-    - name: Docker Hub Description
-      if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
-      uses: peter-evans/dockerhub-description@v2.0.0
-      env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        DOCKERHUB_REPOSITORY: ${{ secrets.IMAGE_NAME }}        
+        go-version: ${{ secrets.GO_VERSION }}
+    - name: Setup Cache
+      uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-        
+    - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go test -tags draft ./...
+  build-backend:
+    name: Backend build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 1
+    - name: Setup Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ secrets.GO_VERSION }}
+    - name: Setup Cache
+      uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-        
+    - run: GOPROXY=direct GOSUMDB=off GO111MODULE=on go build -tags draft ./cmd/main.go
+  build-ui:
+    name: UI build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ secrets.NODE_VERSION }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - run: |
+        cd ui
+        npm i
+        npm run build && npm run export
+        cd ..
+        cd provider-ui
+        npm i
+        npm run build && npm run export
+  tests-ui:
+    name: UI tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ secrets.NODE_VERSION }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - run: |
+        cd ui
+        npm i
+        npm test
+        cd ..
+        cd provider-ui
+        npm i
+        npm test
+        cd ..
+  mesheryctl_build:
+    name: Mesheryctl build & release
+    runs-on: macos-latest
+    needs: [server-tests]
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+    - name: Unshallow
+      run: git fetch --prune --unshallow
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ secrets.GO_VERSION }}
+    - name: Setup Cache
+      uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-        
+    - name: goreleaser WITHOUT tag
+      uses: goreleaser/goreleaser-action@v1
+      if: success() && startsWith(github.ref, 'refs/tags/') == false
+      with:
+        version: latest
+        args: release --snapshot --skip-publish --rm-dist
