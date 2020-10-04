@@ -1,6 +1,6 @@
 ---
 name: General question
-about: Request information about the project; clarify behavior of the software
+about: Request information about the project; clarify the behavior of the software
 title: ''
 labels: 'kind/question'
 assignees: ''
