@@ -32,7 +32,8 @@ const (
 
 var supportedOps = map[string]supportedOperation{
 	customOpCommand: {
-		name: "Apply Custom Service Mesh or Kubernetes Configuration",
+		name:   "Apply Custom Service Mesh or Kubernetes Configuration",
+		opType: meshes.OpCategory_CUSTOM,
 	},
 	smiConformanceCommand: {
 		name:   "SMI Conformance Test",
