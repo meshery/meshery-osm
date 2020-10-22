@@ -12,6 +12,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/kube"
 	corev1 "k8s.io/api/core/v1"
+	kubeerror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -144,7 +145,7 @@ func (test *SmiTest) installConformanceTool() error {
 				"app.kubernetes.io/managed-by": "Helm",
 			},
 		}}, metav1.CreateOptions{})
-	if err != nil {
+	if err != nil && !kubeerror.IsAlreadyExists(err) {
 		return err
 	}
 
