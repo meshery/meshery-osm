@@ -11,7 +11,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.9.0 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gophercloud/gophercloud v0.4.0 // indirect
-	github.com/layer5io/gokit v0.1.15
+	github.com/layer5io/gokit v0.1.16
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381
