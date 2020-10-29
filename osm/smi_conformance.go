@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/layer5io/gokit/smi"
 	"github.com/layer5io/meshery-osm/meshes"
-	"github.com/layer5io/meshery-osm/osm/smi"
 )
 
 func (iClient *Client) validateSMIConformance(id string, version string) error {
