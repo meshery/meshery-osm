@@ -1,3 +1,6 @@
+
+GOPATH = $(shell go env GOPATH)
+
 protoc-setup:
 	cd meshes
 	wget https://raw.githubusercontent.com/layer5io/meshery/master/meshes/meshops.proto
@@ -25,3 +28,19 @@ setup-adapter:
 	find . -type f -exec sed -i '' -e 's/<port>/${PORT}/g' {} +
 	find . -type f -exec sed -i '' -e 's/<go_version>/${GO_VERSION}/g' {} +
 
+.PHONY: local-check
+local-check: tidy
+local-check: golangci-lint
+
+.PHONY: tidy
+tidy:
+	@echo "Executing go mod tidy"
+	go mod tidy
+
+.PHONY: golangci-lint
+golangci-lint: $(GOLANGCILINT)
+	@echo
+	$(GOPATH)/bin/golangci-lint run
+
+$(GOLANGCILINT):
+	(cd /; GO111MODULE=on GOPROXY="direct" GOSUMDB=off go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.30.0)

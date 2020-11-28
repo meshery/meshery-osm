@@ -15,49 +15,61 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"net"
-	"os"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
-
-	"github.com/sirupsen/logrus"
-
-	mesh "github.com/layer5io/meshery-osm/meshes"
+	"github.com/layer5io/meshery-adapter-library/adapter"
+	"github.com/layer5io/meshery-adapter-library/api/grpc"
+	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
+	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
+	"github.com/layer5io/meshkit/logger"
+	"github.com/layer5io/meshkit/utils"
+	"os"
+	"path"
+	"time"
 )
 
-var (
-	gRPCPort = flag.Int("grpc-port", 10009, "The gRPC server port")
+const (
+	serviceName = "osm-adapter"
 )
-
-var log grpclog.LoggerV2
-
-func init() {
-	log = grpclog.NewLoggerV2(os.Stdout, os.Stdout, os.Stdout)
-	grpclog.SetLoggerV2(log)
-}
 
 func main() {
-	flag.Parse()
-
-	if os.Getenv("DEBUG") == "true" {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
-
-	addr := fmt.Sprintf(":%d", *gRPCPort)
-	lis, err := net.Listen("tcp", addr)
+	log, err := logger.New(serviceName, logger.Options{Format: logger.JsonLogFormat, DebugLevel: false})
 	if err != nil {
-		logrus.Fatalln("Failed to listen:", err)
+		fmt.Println("Logger Init Failed", err.Error())
+		os.Exit(1)
 	}
-	s := grpc.NewServer(
-	// grpc.Creds(credentials.NewServerTLSFromCert(&insecure.Cert)),
-	)
-	mesh.RegisterMeshServiceServer(s, &osm.Client{})
 
-	// Serve gRPC Server
-	logrus.Infof("Serving gRPC on %s", addr)
-	logrus.Fatal(s.Serve(lis))
+	cfg, err := internalconfig.New(configprovider.ViperKey)
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
+	kubeconfigHandler, err := internalconfig.NewKubeconfigBuilder(configprovider.ViperKey)
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
+	service := &grpc.Service{}
+	_ = cfg.GetObject(adapter.ServerKey, &service)
+
+	service.Handler = osm.New(cfg, log, kubeconfigHandler)
+	service.Channel = make(chan interface{}, 100)
+	service.StartedAt = time.Now()
+	err = grpc.Start(service, nil)
+	if err != nil {
+		log.Error(grpc.ErrGrpcServer(err))
+		os.Exit(1)
+	}
+}
+
+// This init function can help adapters create the configuration logic work well, so do not remove it although that's
+// not a good idea.
+func init() {
+	err := os.MkdirAll(path.Join(utils.GetHome(), ".meshery", "bin"), 0750)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 }

@@ -1,4 +1,4 @@
-FROM golang:1.13.7 as bd
+FROM golang:1.15.5 as bd
 
 WORKDIR /github.com/layer5io/meshery-osm
 ADD . .
