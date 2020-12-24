@@ -20,7 +20,6 @@ import (
 )
 
 var (
-	ServiceName  = "service_name"
 	OSMOperation = "osm"
 )
 
@@ -30,9 +29,6 @@ func getOperations(op adapter.Operations) adapter.Operations {
 		Description: "OSM Service Mesh",
 		Versions:    []adapter.Version{"v0.3.0", "v0.2.0"},
 		Templates:   adapter.NoneTemplate,
-		AdditionalProperties: map[string]string{
-			ServiceName: OSMOperation,
-		},
 	}
 	return op
 }
