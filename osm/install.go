@@ -42,18 +42,6 @@ func (h *Handler) deleteOSM(version string) (string, error) {
 	return status.Removed, nil
 }
 
-// TODO: Should add the function into meshkit
-func (h *Handler) CreateNamespace(ctx context.Context, namespace string) error {
-	h.Log.Info("Create namespace")
-	_, errGetNs := h.KubeClient.CoreV1().Namespaces().Get(ctx, namespace, metav1.GetOptions{})
-	if apierrors.IsNotFound(errGetNs) {
-		nsSpec := &v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespace}}
-		_, err := h.KubeClient.CoreV1().Namespaces().Create(ctx, nsSpec, metav1.CreateOptions{})
-		return err
-	}
-	return errGetNs
-}
-
 func (h *Handler) installOSM(version string) (string, error) {
 	st := status.Installing
 	Executable, err := exec.LookPath("./scripts/create_osmctl.sh")
