@@ -30,7 +30,17 @@ setup-adapter:
 
 .PHONY: local-check
 local-check: tidy
+local-check: go-fmt
+local-check: go-vet
 local-check: golangci-lint
+
+.PHONY: go-fmt
+go-fmt:
+	go fmt ./...
+
+.PHONY: go-vet
+go-vet:
+	go vet ./...
 
 .PHONY: tidy
 tidy:
