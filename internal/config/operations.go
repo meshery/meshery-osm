@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package osm
+package config
 
 import (
 	"github.com/layer5io/meshery-adapter-library/adapter"
-	"github.com/layer5io/meshery-adapter-library/config"
-	"github.com/layer5io/meshkit/logger"
+	"github.com/layer5io/meshery-adapter-library/meshes"
 )
 
-type Handler struct {
-	adapter.Adapter
-}
+var (
+	OSMOperation = "osm"
+)
 
-func New(config config.Handler, log logger.Handler, kc config.Handler) adapter.Handler {
-	return &Handler{
-		adapter.Adapter{Config: config, Log: log, KubeconfigHandler: kc},
+func getOperations(op adapter.Operations) adapter.Operations {
+	op[OSMOperation] = &adapter.Operation{
+		Type:        int32(meshes.OpCategory_INSTALL),
+		Description: "OSM Service Mesh",
+		Versions:    []adapter.Version{"v0.3.0", "v0.2.0"},
+		Templates:   adapter.NoneTemplate,
 	}
+	return op
 }
