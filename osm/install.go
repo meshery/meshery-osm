@@ -81,7 +81,6 @@ func (h *Handler) installOSM(version, ns string) (string, error) {
 func (h *Handler) applyManifest(del bool, namespace string, contents []byte) error {
 	err := h.MesheryKubeclient.ApplyManifest(contents, mesherykube.ApplyOptions{
 		Namespace: namespace,
-		Update:    true,
 		Delete:    del,
 	})
 	if err != nil {
@@ -193,7 +192,6 @@ func installBinary(res *http.Response, location, platform, name string) error {
 	}
 
 	untar, err := tarxzf(res.Body, location)
-	fmt.Println(untar)
 	if err != nil {
 		return ErrInstallBinary(err)
 	}

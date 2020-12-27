@@ -42,6 +42,18 @@ var (
 	// when an invalid addon operation is requested
 	ErrCustomOperationCode = "osm_test_code"
 
+	// ErrCreatingNSCode represents the errors which are generated
+	// during the process of creating a namespace
+	ErrCreatingNSCode = "osm_test_code"
+
+	// ErrRunExecutableCode represents the errors which are generated
+	// during the running a executable
+	ErrRunExecutableCode = "osm_test_code"
+
+	// ErrSidecarInjectionCode represents the errors which are generated
+	// during the process of enabling/disabling sidecar injection
+	ErrSidecarInjectionCode = "osm_test_code"
+
 	// ErrOpInvalid represents the errors which are generated
 	// when an invalid operation is requested
 	ErrOpInvalid = errors.NewDefault(errors.ErrOpInvalid, "Invalid operation")
@@ -85,4 +97,20 @@ func ErrSampleApp(err error) error {
 // ErrCustomOperation is the error for streaming event
 func ErrCustomOperation(err error) error {
 	return errors.NewDefault(ErrCustomOperationCode, fmt.Sprintf("Error with custom operation: %s", err.Error()))
+}
+
+// ErrCreatingNS is the error while creating the namespace
+func ErrCreatingNS(err error) error {
+	return errors.NewDefault(ErrCreatingNSCode, fmt.Sprintf("error creating namespace: %s", err.Error()))
+}
+
+// ErrRunExecutable is the error while running an executable
+func ErrRunExecutable(err error) error {
+	return errors.NewDefault(ErrRunExecutableCode, fmt.Sprintf("error running executable: %s", err.Error()))
+}
+
+// ErrSidecarInjection is the error while enabling/disabling sidecar injection
+// on a particular namespace
+func ErrSidecarInjection(err error) error {
+	return errors.NewDefault(ErrSidecarInjectionCode, fmt.Sprintf("error sidecar injection: %s", err.Error()))
 }
