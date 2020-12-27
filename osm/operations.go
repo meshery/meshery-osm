@@ -29,7 +29,7 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 	case internalconfig.OSMOperation:
 		go func(hh *Handler, ee *adapter.Event) {
 			version := string(operations[request.OperationName].Versions[0])
-			stat, err := hh.Execute(request.IsDeleteOperation, version)
+			stat, err := hh.Execute(request.IsDeleteOperation, version, request.Namespace)
 			if err != nil {
 				e.Summary = fmt.Sprintf("Error while %s OSM service mesh", stat)
 				e.Details = err.Error()

@@ -27,7 +27,7 @@ func getOperations(op adapter.Operations) adapter.Operations {
 	op[OSMOperation] = &adapter.Operation{
 		Type:        int32(meshes.OpCategory_INSTALL),
 		Description: "OSM Service Mesh",
-		Versions:    []adapter.Version{"v0.3.0", "v0.2.0"},
+		Versions:    []adapter.Version{"v0.6.0", "v0.5.0"},
 		Templates:   adapter.NoneTemplate,
 	}
 	return op

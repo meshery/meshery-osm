@@ -16,6 +16,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"time"
+
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
 	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
@@ -23,9 +27,6 @@ import (
 	"github.com/layer5io/meshery-osm/osm"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
-	"os"
-	"path"
-	"time"
 )
 
 const (
@@ -33,10 +34,20 @@ const (
 )
 
 func main() {
-	log, err := logger.New(serviceName, logger.Options{Format: logger.JsonLogFormat, DebugLevel: false})
+	log, err := logger.New(serviceName, logger.Options{Format: logger.SyslogLogFormat, DebugLevel: displayDebugLogs()})
 	if err != nil {
 		fmt.Println("Logger Init Failed", err.Error())
 		os.Exit(1)
+	}
+
+	if err = os.Setenv("KUBECONFIG", path.Join(
+		internalconfig.KubeConfigDefaults[configprovider.FilePath],
+		fmt.Sprintf("%s.%s", internalconfig.KubeConfigDefaults[configprovider.FileName],
+			internalconfig.KubeConfigDefaults[configprovider.FileType],
+		)),
+	); err != nil {
+		// Fail silently
+		log.Warn(err)
 	}
 
 	cfg, err := internalconfig.New(configprovider.ViperKey)
@@ -57,6 +68,9 @@ func main() {
 	service.Handler = osm.New(cfg, log, kubeconfigHandler)
 	service.Channel = make(chan interface{}, 100)
 	service.StartedAt = time.Now()
+
+	// Server Initialization
+	log.Info("Adaptor Listening at port: ", service.Port)
 	err = grpc.Start(service, nil)
 	if err != nil {
 		log.Error(grpc.ErrGrpcServer(err))
@@ -72,4 +86,14 @@ func init() {
 		fmt.Println(err)
 		os.Exit(0)
 	}
+}
+
+// displayDebugLogs will return true if the "DEBUG" env var
+// is set to "true"
+func displayDebugLogs() bool {
+	if os.Getenv("DEBUG") == "true" {
+		return true
+	}
+
+	return false
 }
