@@ -44,3 +44,8 @@ func NewKubeconfigBuilder(provider string) (config.Handler, error) {
 	}
 	return nil, config.ErrEmptyConfig
 }
+
+// RootPath returns the root config path
+func RootPath() string {
+	return configRootPath
+}
