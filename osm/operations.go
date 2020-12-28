@@ -11,6 +11,11 @@ import (
 	"github.com/layer5io/meshkit/errors"
 )
 
+const (
+	// SMIManifest is the manifest.yaml file for smi conformance tool
+	SMIManifest = "https://raw.githubusercontent.com/layer5io/learn-layer5/master/smi-conformance/manifest.yml"
+)
+
 func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationRequest) error {
 	operations := make(adapter.Operations)
 	err := h.Config.GetObject(adapter.OperationsKey, &operations)
@@ -83,7 +88,11 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 			_, err := hh.RunSMITest(adapter.SMITestOptions{
 				Ctx:         context.TODO(),
 				OperationID: ee.Operationid,
-				Labels:      make(map[string]string),
+				Manifest:    SMIManifest,
+				Namespace:   "meshery",
+				Labels: map[string]string{
+					"openservicemesh.io/monitored-by": "osm",
+				},
 				Annotations: make(map[string]string),
 			})
 			if err != nil {
