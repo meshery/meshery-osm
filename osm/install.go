@@ -165,6 +165,8 @@ func downloadBinary(platform, arch, release string) (*http.Response, error) {
 		arch,
 	)
 
+	// we need variable url here hence,
+	// #nosec
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, ErrDownloadBinary(err)

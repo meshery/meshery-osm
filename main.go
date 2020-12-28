@@ -91,9 +91,5 @@ func init() {
 // displayDebugLogs will return true if the "DEBUG" env var
 // is set to "true"
 func displayDebugLogs() bool {
-	if os.Getenv("DEBUG") == "true" {
-		return true
-	}
-
-	return false
+	return os.Getenv("DEBUG") == "true"
 }
