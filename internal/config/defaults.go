@@ -18,6 +18,7 @@ import (
 	"github.com/layer5io/meshery-adapter-library/common"
 	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
 	"github.com/layer5io/meshery-adapter-library/status"
+	smp "github.com/layer5io/service-mesh-performance/spec"
 )
 
 var (
@@ -32,6 +33,7 @@ var (
 		"name":    "osm",
 		"status":  status.NotInstalled,
 		"version": "none",
+		"type":    smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String(),
 	}
 
 	ProviderConfigDefaults = map[string]string{

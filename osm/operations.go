@@ -101,9 +101,6 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 				hh.StreamErr(e, err)
 				return
 			}
-			ee.Summary = fmt.Sprintf("%s test %s successfully", name, status.Completed)
-			ee.Details = ""
-			hh.StreamInfo(e)
 		}(h, e)
 	default:
 		h.StreamErr(e, errors.NewDefault(errors.ErrOpInvalid, "Invalid operation"))
