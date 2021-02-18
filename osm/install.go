@@ -9,7 +9,7 @@ import (
 	mesherykube "github.com/layer5io/meshkit/utils/kubernetes"
 )
 
-func (h *Handler) deleteOSM(version string) (string, error) {
+func (h *Handler) deleteOSM(version, namespace string) (string, error) {
 	st := status.Removing
 	Executable, err := exec.LookPath("./scripts/delete_osmctl.sh")
 	if err != nil {
@@ -24,6 +24,7 @@ func (h *Handler) deleteOSM(version string) (string, error) {
 	}
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("OSM_VERSION=%s", version),
+		fmt.Sprintf("NAMESPACE=%s", namespace),
 	)
 
 	err = cmd.Start()
@@ -38,7 +39,7 @@ func (h *Handler) deleteOSM(version string) (string, error) {
 	return status.Removed, nil
 }
 
-func (h *Handler) installOSM(version string) (string, error) {
+func (h *Handler) installOSM(version, namespace string) (string, error) {
 	st := status.Installing
 	Executable, err := exec.LookPath("./scripts/create_osmctl.sh")
 	if err != nil {
@@ -52,6 +53,7 @@ func (h *Handler) installOSM(version string) (string, error) {
 	}
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("OSM_VERSION=%s", version),
+		fmt.Sprintf("NAMESPACE=%s", namespace),
 	)
 
 	err = cmd.Start()
@@ -66,11 +68,11 @@ func (h *Handler) installOSM(version string) (string, error) {
 	return status.Installed, nil
 }
 
-func (h *Handler) Execute(del bool, version string) (string, error) {
+func (h *Handler) Execute(del bool, version, namespace string) (string, error) {
 	if del {
-		return h.deleteOSM(version)
+		return h.deleteOSM(version, namespace)
 	}
-	return h.installOSM(version)
+	return h.installOSM(version, namespace)
 }
 
 func (h *Handler) applyManifest(del bool, namespace string, contents []byte) error {

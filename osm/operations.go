@@ -27,18 +27,32 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 	//deployment
 	switch request.OperationName {
 	case internalconfig.OSMOperation:
-		go func(hh *Handler, ee *adapter.Event) {
+		go func(hh *Handler, adapterEvent *adapter.Event) {
 			version := string(operations[request.OperationName].Versions[0])
-			stat, err := hh.Execute(request.IsDeleteOperation, version)
+			stat, err := hh.Execute(request.IsDeleteOperation, version, request.Namespace)
 			if err != nil {
-				e.Summary = fmt.Sprintf("Error while %s OSM service mesh", stat)
-				e.Details = err.Error()
-				hh.StreamErr(e, err)
+				adapterEvent.Summary = fmt.Sprintf("Error while %s OSM service mesh", stat)
+				adapterEvent.Details = err.Error()
+				hh.StreamErr(adapterEvent, err)
 				return
 			}
-			ee.Summary = fmt.Sprintf("OSM service mesh %s successfully", stat)
-			ee.Details = fmt.Sprintf("The OSM service mesh is now %s.", stat)
-			hh.StreamInfo(e)
+			adapterEvent.Summary = fmt.Sprintf("OSM service mesh %s successfully", stat)
+			adapterEvent.Details = fmt.Sprintf("The OSM service mesh is now %s.", stat)
+			hh.StreamInfo(adapterEvent)
+		}(h, e)
+	case internalconfig.OSMSampleBookBuyer:
+		go func(handler *Handler, adapterEvent *adapter.Event) {
+			version := string(operations[request.OperationName].Versions[0])
+			stat, err := handler.OSMSampleBookBuyerExecute(request.IsDeleteOperation, version)
+			if err != nil {
+				adapterEvent.Summary = fmt.Sprintf("Error while %s %s application", stat, request.OperationName)
+				adapterEvent.Details = err.Error()
+				handler.StreamErr(adapterEvent, err)
+				return
+			}
+			adapterEvent.Summary = fmt.Sprintf("OSM sample book buyer app %s successfully", stat)
+			adapterEvent.Details = fmt.Sprintf("The OSM book buyer sample application is now %s.", stat)
+			handler.StreamInfo(adapterEvent)
 		}(h, e)
 	case common.BookInfoOperation, common.HTTPBinOperation, common.ImageHubOperation, common.EmojiVotoOperation:
 		go func(hh *Handler, ee *adapter.Event) {

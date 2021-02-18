@@ -20,7 +20,8 @@ import (
 )
 
 var (
-	OSMOperation = "osm"
+	OSMOperation       = "osm"
+	OSMSampleBookBuyer = "osm-sample-book-buyer"
 )
 
 func getOperations(op adapter.Operations) adapter.Operations {
@@ -30,5 +31,14 @@ func getOperations(op adapter.Operations) adapter.Operations {
 		Versions:    []adapter.Version{"v0.3.0", "v0.2.0"},
 		Templates:   adapter.NoneTemplate,
 	}
+
+	// add sample book buyer operation
+	op[OSMSampleBookBuyer] = &adapter.Operation{
+		Type:        int32(meshes.OpCategory_SAMPLE_APPLICATION),
+		Description: "OSM Sample Application",
+		Versions:    []adapter.Version{"v0.3.0", "v0.2.0"},
+		Templates:   adapter.NoneTemplate,
+	}
+
 	return op
 }
