@@ -26,6 +26,10 @@ type Handler struct {
 
 func New(config config.Handler, log logger.Handler, kc config.Handler) adapter.Handler {
 	return &Handler{
-		adapter.Adapter{Config: config, Log: log, KubeconfigHandler: kc},
+		Adapter: adapter.Adapter{
+			Config:            config,
+			Log:               log,
+			KubeconfigHandler: kc,
+		},
 	}
 }
