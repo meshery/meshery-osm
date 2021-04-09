@@ -7,7 +7,6 @@ import (
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/status"
-	"github.com/layer5io/meshkit/utils"
 )
 
 // noneNamespace indicates unset namespace
@@ -52,11 +51,7 @@ func (h *Handler) installSampleApp(del bool, namespace string, templates []adapt
 		st = status.Removing
 	}
 	for _, template := range templates {
-		contents, err := utils.ReadFileSource(string(template))
-		if err != nil {
-			return st, ErrSampleApp(err)
-		}
-		err = h.applyManifest(del, namespace, []byte(contents))
+		err := h.applyManifest(del, namespace, []byte(template.String()))
 		if err != nil {
 			return st, ErrSampleApp(err)
 		}
