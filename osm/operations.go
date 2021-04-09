@@ -11,6 +11,7 @@ import (
 	"github.com/layer5io/meshkit/errors"
 )
 
+// ApplyOperation function contains the operation handlers
 func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationRequest) error {
 	operations := make(adapter.Operations)
 	err := h.Config.GetObject(adapter.OperationsKey, &operations)
