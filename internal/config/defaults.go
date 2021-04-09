@@ -23,17 +23,16 @@ import (
 
 var (
 	ServerDefaults = map[string]string{
-		"name":     "osm-adapter",
+		"name":     smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String(),
+		"type":     "adapter",
 		"port":     "10009",
 		"traceurl": "none",
-		"version":  "v0.1.0",
 	}
 
 	MeshSpecDefaults = map[string]string{
-		"name":    "osm",
+		"name":    smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String(),
 		"status":  status.NotInstalled,
 		"version": "none",
-		"type":    smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String(),
 	}
 
 	ProviderConfigDefaults = map[string]string{

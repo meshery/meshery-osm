@@ -38,11 +38,11 @@ func getOperations(op adapter.Operations) adapter.Operations {
 		Description: "Bookstore Application",
 		Versions:    []adapter.Version{"v0.6.0", "v0.5.0"},
 		Templates: []adapter.Template{
-			"https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookbuyer.yaml",
-			"https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookstore-v1.yaml",
-			"https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookthief.yaml",
-			"https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookwarehouse.yaml",
-			"https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/traffic-split.yaml",
+			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/bookbuyer.yaml",
+			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/bookstore-v1.yaml",
+			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/bookthief.yaml",
+			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/bookwarehouse.yaml",
+			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/traffic-split.yaml",
 			"file://templates/osm-bookstore-traffic-access-v1.yaml",
 		},
 		AdditionalProperties: map[string]string{

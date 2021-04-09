@@ -31,6 +31,8 @@ import (
 
 const (
 	serviceName = "osm-adapter"
+	version     = "none"
+	gitsha      = "none"
 )
 
 func main() {
@@ -68,6 +70,8 @@ func main() {
 	service.Handler = osm.New(cfg, log, kubeconfigHandler)
 	service.Channel = make(chan interface{}, 100)
 	service.StartedAt = time.Now()
+	service.Version = version
+	service.GitSHA = gitsha
 
 	// Server Initialization
 	log.Info("Adaptor Listening at port: ", service.Port)

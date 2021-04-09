@@ -20,10 +20,12 @@ import (
 	"github.com/layer5io/meshkit/logger"
 )
 
+// Handler instance for this adapter
 type Handler struct {
 	adapter.Adapter
 }
 
+// New initializes a new handler instance
 func New(config config.Handler, log logger.Handler, kc config.Handler) adapter.Handler {
 	return &Handler{
 		Adapter: adapter.Adapter{
