@@ -1,6 +1,6 @@
 FROM golang:1.15 as build-env
 ARG VERSION
-ARG GIT_SHA
+ARG GIT_COMMITSHA
 WORKDIR /github.com/layer5io/meshery-osm
 COPY go.mod go.sum ./
 RUN go mod download
