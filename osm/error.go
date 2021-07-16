@@ -108,11 +108,11 @@ func ErrCreatingNS(err error) error {
 
 // ErrRunExecutable is the error while running an executable
 func ErrRunExecutable(err error) error {
-	return errors.New(ErrRunExecutableCode, errors.Alert, []string{"error running executable: ", err.Error()}, []string{}, []string{}, []string{})
+	return errors.New(ErrRunExecutableCode, errors.Alert, []string{"Error running executable: ", err.Error()}, []string{}, []string{}, []string{})
 }
 
 // ErrSidecarInjection is the error while enabling/disabling sidecar injection
 // on a particular namespace
 func ErrSidecarInjection(err error) error {
-	return errors.New(ErrSidecarInjectionCode, errors.Alert, []string{"error sidecar injection: ", err.Error()}, []string{}, []string{}, []string{})
+	return errors.New(ErrSidecarInjectionCode, errors.Alert, []string{"Error sidecar injection: ", err.Error()}, []string{}, []string{}, []string{})
 }
