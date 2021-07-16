@@ -5,6 +5,12 @@ protoc-setup:
 	cd meshes
 	wget https://raw.githubusercontent.com/layer5io/meshery/master/meshes/meshops.proto
 
+check: error
+	golangci-lint run
+
+check-clean-cache:
+	golangci-lint cache clean
+
 proto:	
 	protoc -I meshes/ meshes/meshops.proto --go_out=plugins=grpc:./meshes/
 
@@ -51,6 +57,10 @@ tidy:
 golangci-lint: $(GOLANGCILINT)
 	@echo
 	$(GOPATH)/bin/golangci-lint run
+
+.PHONY: error
+error:
+	go run github.com/layer5io/meshkit/cmd/errorutil -d . update -i ./helpers -o ./helpers
 
 $(GOLANGCILINT):
 	(cd /; GO111MODULE=on GOPROXY="direct" GOSUMDB=off go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.30.0)
