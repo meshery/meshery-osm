@@ -8,7 +8,6 @@ import (
 	"github.com/layer5io/meshery-adapter-library/common"
 	"github.com/layer5io/meshery-adapter-library/status"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
-	"github.com/layer5io/meshkit/errors"
 )
 
 // ApplyOperation function contains the operation handlers
@@ -102,7 +101,7 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 			hh.StreamInfo(e)
 		}(h, e)
 	default:
-		h.StreamErr(e, errors.NewDefault(errors.ErrOpInvalid, "Invalid operation"))
+		h.StreamErr(e, ErrOpInvalid)
 	}
 	return nil
 }
