@@ -51,3 +51,6 @@ yarn.lock
 
 # Generated binaries
 **/bin
+
+cmd/errorutil/errorutil
+/errorutil
