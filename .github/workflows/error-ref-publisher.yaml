@@ -9,7 +9,7 @@ on:
 jobs:
   Update-error-codes:
     name: Error codes utility
-    if: github.repository == 'layer5io/meshkit'
+    if: github.repository == 'meshery/meshery-osm'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,6 +25,7 @@ jobs:
 
       - name: Run utility
         run: |
+          go get github.com/layer5io/meshkit/cmd/errorutil
           go run github.com/layer5io/meshkit/cmd/errorutil -d . update --skip-dirs meshery -i ./helpers -o ./helpers
       # to update errorutil* files in meshkit repo
       - name: Commit changes
@@ -59,6 +60,6 @@ jobs:
             exit
           fi
           git add ./docs/_data/errorref/osm_errors_export.json
-          git commit -m "[Docs] Error Code Reference: Updated codes for meshery-osm library" --signoff
+          git commit -m "[Docs] Error Code Reference: Updated codes for OSM adapter library" --signoff
           git push origin master
           
