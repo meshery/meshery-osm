@@ -60,6 +60,6 @@ jobs:
             exit
           fi
           git add ./docs/_data/errorref/osm_errors_export.json
-          git commit -m "[Docs] Error Code Reference: Updated codes for OSM adapter library" --signoff
+          git commit -m "[Docs] Error Code Reference: Updated codes for OSM adapter " --signoff
           git push origin master
           
