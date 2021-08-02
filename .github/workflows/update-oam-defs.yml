@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       NEW_OSM_VERSION: ${{ steps.glrt.outputs.release }}
-      CURRENT_OSM_VERSION: ${{ env.CURRENT_OSM_VERSION }}
+      EXISTS: ${{ env.EXISTS }}
     steps:
       - name: Get latest release tag
         id: glrt
@@ -21,13 +21,18 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 1
-      - name: Get CURRENT_OSM_VERSION from .env
+      - name: Check if manifests for latest release exist
         run: |
-          cat .github/.env > $GITHUB_ENV
+          if [ -d templates/oam/workloads/workloads-${{ steps.glrt.outputs.release }} ]
+          then
+           echo "EXISTS=true" > $GITHUB_ENV
+          else
+           export "EXISTS=false" > $GITHUB_ENV
+          fi
   generator:
     name: Generate and push OAM definitions
     needs: [check_osm_version]
-    if: ${{ needs.check_osm_version.outputs.NEW_OSM_VERSION  >  needs.check_osm_version.outputs.CURRENT_OSM_VERSION }}
+    if: ${{ !needs.check_osm_version.outputs.EXISTS }}
     env:
       NEW_OSM_VERSION: ${{ needs.check_osm_version.outputs.NEW_OSM_VERSION }}
     runs-on: ubuntu-latest
@@ -45,7 +50,7 @@ jobs:
           curl --remote-name-all `curl -H "Accept: application/vnd.github.VERSION.raw" https://api.github.com/repos/openservicemesh/osm/contents/charts/osm/crds\?ref\=$NEW_OSM_VERSION | jq 'map(.download_url) | .[]' | tr -d '"'`
           cd ..
           awk 'FNR==1 && NR>1 { printf("\n%s\n\n","---") } 1' osm-crds/*.yaml > ~/osm.yaml
-      - name: Bulild jsonschema util
+      - name: Build jsonschema util
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
@@ -58,25 +63,32 @@ jobs:
           make linux
       - name: Generate Workload definitions
         run: |
-          mkdir -p ./templates/oam/workloads-$NEW_OSM_VERSION
+          dirPath=../templates/oam/workloads/workloads-$NEW_OSM_VERSION
           cd util
-          template='{"apiVersion":"core.oam.dev/v1alpha1","kind":"WorkloadDefinition","metadata":{"name":""},"spec":{"definitionRef":{"name":""}}}'
+          mkdir -p $dirPath
+          resourceType=CustomResourceDefinition
+          meshName=osm
+          smpMeshName=OSM
+          template='{"apiVersion":"core.oam.dev/v1alpha1","kind":"WorkloadDefinition","metadata":{},"spec":{"definitionRef":{},"metadata":{"@type":"pattern.meshery.io/mesh/workload","meshVersion":"'$NEW_OSM_VERSION'","meshName":"'$smpMeshName'","k8sAPIVersion":null,"k8sKind":"'$resourceType'"}}}'
           crds=$(./kubeopenapi-jsonschema --location ~/osm.yaml -t yaml --filter '$[?(@.kind=="CustomResourceDefinition")]' -o json --o-filter '$..["spec"]["names"]["kind"]' | jq '.[]')
           for t in ${crds[@]}; do
             nameUpper=`echo $t  | tr -d '"'`
             nameLower=`echo $t  | tr -d '"' | tr '[:upper:]' '[:lower:]'`
-            definitionRef=$(printf %sosm.meshery.layer5.io $nameLower)
-            name=`echo $t | tr -d '"' | tr '[:upper:]' '[:lower:]'`
-            definitionRef=$(printf %sosm.meshery.layer5.io $name)
-            ./kubeopenapi-jsonschema --location ~/osm.yaml -t yaml --filter '$[?(@.kind=="CustomResourceDefinition" && @.spec.names.kind=='$t')]..openAPIV3Schema.properties.spec' --o-filter "$[]" -o json | jq '.[] | .version = "'$NEW_OSM_VERSION'" | .title = "'$(printf %sOSM $nameUpper)'"' > ../templates/oam/workloads-$NEW_OSM_VERSION/$(printf %sosm.meshery.layer5io.schema.json $nameLower)
-            echo $template | jq ' ."metadata"."name" = "'$(printf %sOSM $nameUpper)'" | ."spec"."definitionRef"."name"="'$definitionRef'"' > ../templates/oam/workloads-$NEW_OSM_VERSION/$(printf %sosm_definition.json $nameLower)
+            definitionRef=$(printf %s.osm.meshery.layer5.io $nameLower)
+            ./kubeopenapi-jsonschema --location ~/osm.yaml -t yaml --filter '$[?(@.kind=="CustomResourceDefinition" && @.spec.names.kind=='$t')]..openAPIV3Schema.properties.spec' --o-filter "$[]" -o json |\
+            jq '
+            .[]
+            | .version = "'$NEW_OSM_VERSION'"
+            | ."object-type" = "'$nameUpper'"
+            | ."service-mesh" = "'$meshName'" ' > $dirPath/$nameLower.osm.meshery.layer5io.schema.json
+            echo $template |\
+            jq '
+            ."metadata"."name" = "'$(printf %sOSM $nameUpper)'"
+            | ."spec"."definitionRef"."name"="'$definitionRef'" ' > $dirPath/$nameLower.osm_definition.json
           done
       - name: Cleanup
         run: |
-          rm -rf util osm-*
-      - name: Update OSM version in .env
-        run: |
-          echo "CURRENT_OSM_VERSION=$NEW_OSM_VERSION" > .github/.env
+          rm -rf util
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
