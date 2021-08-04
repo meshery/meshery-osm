@@ -15,12 +15,15 @@
 package config
 
 import (
+	"strings"
+
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/meshes"
+	smp "github.com/layer5io/service-mesh-performance/spec"
 )
 
 var (
-	OSMOperation          = "osm"
+	OSMOperation          = strings.ToLower(smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String())
 	OSMBookStoreOperation = "osm_bookstore_app"
 	ServiceName           = "service_name"
 )
