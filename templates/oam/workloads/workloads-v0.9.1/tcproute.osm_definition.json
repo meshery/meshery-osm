@@ -1,0 +1,19 @@
+{
+  "apiVersion": "core.oam.dev/v1alpha1",
+  "kind": "WorkloadDefinition",
+  "metadata": {
+    "name": "TCPRoute.OSM"
+  },
+  "spec": {
+    "definitionRef": {
+      "name": "tcproute.osm.meshery.layer5.io"
+    },
+    "metadata": {
+      "@type": "pattern.meshery.io/mesh/workload",
+      "meshVersion": "v0.9.1",
+      "meshName": "OPEN_SERVICE_MESH",
+      "k8sAPIVersion": "specs.smi-spec.io/v1alpha4",
+      "k8sKind": "TCPRoute"
+    }
+  }
+}

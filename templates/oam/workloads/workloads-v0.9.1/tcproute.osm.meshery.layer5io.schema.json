@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "required": [
+    "matches"
+  ],
+  "properties": {
+    "matches": {
+      "description": "Match conditions of this route.",
+      "type": "object",
+      "required": [
+        "ports"
+      ],
+      "properties": {
+        "ports": {
+          "description": "Port numbers to match TCP traffic.",
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "version": "v0.9.1",
+  "object-type": "TCPRoute",
+  "service-mesh": "osm"
+}
