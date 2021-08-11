@@ -1,12 +1,13 @@
 package osm
 
 import (
+	"context"
 	"fmt"
-	"os"
-	"os/exec"
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/status"
+	mesherykube "github.com/layer5io/meshkit/utils/kubernetes"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // noneNamespace indicates unset namespace
@@ -51,7 +52,7 @@ func (h *Handler) installSampleApp(del bool, namespace string, templates []adapt
 		st = status.Removing
 	}
 	for _, template := range templates {
-		err := h.applyManifest(del, namespace, []byte(template.String()))
+		err := h.applyManifest([]byte(template.String()), del, namespace)
 		if err != nil {
 			return st, ErrSampleApp(err)
 		}
@@ -60,31 +61,42 @@ func (h *Handler) installSampleApp(del bool, namespace string, templates []adapt
 }
 
 // sidecarInjection enables/disables sidecar injection on a namespace
-func (h *Handler) sidecarInjection(del bool, version, ns string) error {
-	exe, err := h.getExecutable(version)
+func (h *Handler) sidecarInjection(del bool, version, namespace string) error {
+	kclient := h.KubeClient
+	if kclient == nil {
+		return ErrNilClient
+	}
+
+	// updating the label on the namespace
+	ns, err := kclient.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
-	injectCmd := "add"
+	if ns.ObjectMeta.Labels == nil {
+		ns.ObjectMeta.Labels = map[string]string{}
+	}
+	ns.ObjectMeta.Labels["openservicemesh.io/monitored-by"] = "osm"
+
 	if del {
-		injectCmd = "remove"
+		delete(ns.ObjectMeta.Labels, "openservicemesh.io/monitored-by")
 	}
 
-	cmd := &exec.Cmd{
-		Path: exe,
-		Args: []string{
-			exe,
-			"namespace",
-			injectCmd,
-			ns,
-		},
-		Stdout: os.Stdout,
-		Stderr: os.Stdout,
+	// updating the annotations on the namespace
+	if ns.ObjectMeta.Annotations == nil {
+		ns.ObjectMeta.Annotations = map[string]string{}
+	}
+	ns.ObjectMeta.Annotations["openservicemesh.io/sidecar-injection"] = "enabled"
+
+	if del {
+		delete(ns.ObjectMeta.Annotations, "openservicemesh.io/sidecar-injection")
 	}
 
-	if err := cmd.Run(); err != nil {
-		return ErrRunExecutable(err)
+	fmt.Println(ns.ObjectMeta)
+
+	_, err = kclient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -101,7 +113,26 @@ metadata:
 		ns,
 	)
 
-	if err := h.applyManifest(del, noneNamespace, []byte(manifest)); err != nil {
+	if err := h.applyManifest([]byte(manifest), del, noneNamespace); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *Handler) applyManifest(contents []byte, isDel bool, namespace string) error {
+	kclient := h.MesheryKubeclient
+	if kclient == nil {
+		return ErrNilClient
+	}
+
+	err := kclient.ApplyManifest(contents, mesherykube.ApplyOptions{
+		Namespace: namespace,
+		Update:    true,
+		Delete:    isDel,
+	})
+
+	if err != nil {
 		return err
 	}
 

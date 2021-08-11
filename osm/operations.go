@@ -29,15 +29,15 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 	case internalconfig.OSMOperation:
 		go func(hh *Handler, ee *adapter.Event) {
 			version := string(operations[request.OperationName].Versions[0])
-			stat, err := hh.Execute(request.IsDeleteOperation, version, request.Namespace)
+			stat, err := hh.installOSM(request.IsDeleteOperation, version, request.Namespace)
 			if err != nil {
-				e.Summary = fmt.Sprintf("Error while %s OSM service mesh", stat)
+				e.Summary = fmt.Sprintf("Error while %s Open service mesh", stat)
 				e.Details = err.Error()
 				hh.StreamErr(e, err)
 				return
 			}
-			ee.Summary = fmt.Sprintf("OSM service mesh %s successfully", stat)
-			ee.Details = fmt.Sprintf("The OSM service mesh is now %s.", stat)
+			ee.Summary = fmt.Sprintf("Open service mesh %s successfully", stat)
+			ee.Details = fmt.Sprintf("Open service mesh is now %s.", stat)
 			hh.StreamInfo(e)
 		}(h, e)
 	case
