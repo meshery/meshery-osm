@@ -10,51 +10,51 @@ var (
 
 	// ErrInstallOSMCode represents the errors which are generated
 	// during open service mesh install process
-	ErrInstallOSMCode = "osm_test_code"
+	ErrInstallOSMCode = "1000"
 
 	// ErrTarXZFCode represents the errors which are generated
 	// during decompressing and extracting tar.gz file
-	ErrTarXZFCode = "osm_test_code"
+	ErrTarXZFCode = "1001"
 
 	// ErrMeshConfigCode represents the errors which are generated
 	// when an invalid mesh config is found
-	ErrMeshConfigCode = "osm_test_code"
+	ErrMeshConfigCode = "1002"
 
 	// ErrRunOsmCtlCmdCode represents the errors which are generated
 	// during fetch manifest process
-	ErrRunOsmCtlCmdCode = "osm_test_code"
+	ErrRunOsmCtlCmdCode = "1003"
 
 	// ErrDownloadBinaryCode represents the errors which are generated
 	// during binary download process
-	ErrDownloadBinaryCode = "osm_test_code"
+	ErrDownloadBinaryCode = "1004"
 
 	// ErrInstallBinaryCode represents the errors which are generated
 	// during binary installation process
-	ErrInstallBinaryCode = "osm_test_code"
+	ErrInstallBinaryCode = "1005"
 
 	// ErrSampleAppCode represents the errors which are generated
 	// duing sample app installation
-	ErrSampleAppCode = "osm_test_code"
+	ErrSampleAppCode = "1006"
 
 	// ErrCustomOperationCode represents the errors which are generated
 	// when an invalid addon operation is requested
-	ErrCustomOperationCode = "osm_test_code"
+	ErrCustomOperationCode = "1007"
 
 	// ErrCreatingNSCode represents the errors which are generated
 	// during the process of creating a namespace
-	ErrCreatingNSCode = "osm_test_code"
+	ErrCreatingNSCode = "1008"
 
 	// ErrRunExecutableCode represents the errors which are generated
 	// during the running a executable
-	ErrRunExecutableCode = "osm_test_code"
+	ErrRunExecutableCode = "1009"
 
 	// ErrSidecarInjectionCode represents the errors which are generated
 	// during the process of enabling/disabling sidecar injection
-	ErrSidecarInjectionCode = "osm_test_code"
+	ErrSidecarInjectionCode = "1010"
 
 	// ErrOpInvalidCode represents the error which is generated when
 	// there is an invalid operation
-	ErrOpInvalidCode = "osm_test_code"
+	ErrOpInvalidCode = "1011"
 
 	// ErrOpInvalid represents the errors which are generated
 	// when an invalid operation is requested
