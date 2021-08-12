@@ -17,8 +17,6 @@ log.txt
 
 .vscode/
 
-config
-
 *.config
 
 Chart.min.js
