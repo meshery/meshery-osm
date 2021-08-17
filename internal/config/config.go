@@ -11,6 +11,12 @@ import (
 	smp "github.com/layer5io/service-mesh-performance/spec"
 )
 
+const (
+	// OAM Metadata constants
+	OAMAdapterNameMetadataKey       = "adapter.meshery.io/name"
+	OAMComponentCategoryMetadataKey = "ui.meshery.io/category"
+)
+
 var (
 	configRootPath = path.Join(utils.GetHome(), ".meshery")
 
