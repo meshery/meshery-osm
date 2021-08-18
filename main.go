@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
@@ -25,6 +26,7 @@ import (
 	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
+	"github.com/layer5io/meshery-osm/osm/oam"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
 )
@@ -73,6 +75,8 @@ func main() {
 	service.Version = version
 	service.GitSHA = gitsha
 
+	go registerCapabilities(service.Port, log)
+
 	// Server Initialization
 	log.Info("Adaptor Listening at port: ", service.Port)
 	err = grpc.Start(service, nil)
@@ -96,4 +100,40 @@ func init() {
 // is set to "true"
 func displayDebugLogs() bool {
 	return os.Getenv("DEBUG") == "true"
+}
+
+func mesheryServerAddress() string {
+	meshReg := os.Getenv("MESHERY_SERVER")
+
+	if meshReg != "" {
+		if strings.HasPrefix(meshReg, "http") {
+			return meshReg
+		}
+
+		return "http://" + meshReg
+	}
+
+	return "http://localhost:9081"
+}
+
+func serviceAddress() string {
+	svcAddr := os.Getenv("SERVICE_ADDR")
+
+	if svcAddr != "" {
+		return svcAddr
+	}
+
+	return "mesherylocal.layer5.io"
+}
+
+func registerCapabilities(port string, log logger.Handler) {
+	// Register workloads
+	if err := oam.RegisterWorkloads(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
+		log.Info(err.Error())
+	}
+
+	// Register traits
+	if err := oam.RegisterTraits(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
+		log.Info(err.Error())
+	}
 }

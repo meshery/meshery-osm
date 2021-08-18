@@ -32,7 +32,7 @@ func (h *Handler) installOSMBookStoreSampleApp(del bool, version string, templat
 		if err := createNS(h, ns, del); err != nil {
 			return st, ErrCreatingNS(err)
 		}
-		if err := h.sidecarInjection(del, version, ns); err != nil {
+		if err := h.sidecarInjection(ns, del); err != nil {
 			return st, ErrSidecarInjection(err)
 		}
 	}
@@ -61,7 +61,7 @@ func (h *Handler) installSampleApp(del bool, namespace string, templates []adapt
 }
 
 // sidecarInjection enables/disables sidecar injection on a namespace
-func (h *Handler) sidecarInjection(del bool, version, namespace string) error {
+func (h *Handler) sidecarInjection(namespace string, del bool) error {
 	kclient := h.KubeClient
 	if kclient == nil {
 		return ErrNilClient

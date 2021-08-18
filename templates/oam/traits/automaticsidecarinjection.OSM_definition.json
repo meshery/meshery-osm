@@ -1,0 +1,14 @@
+{
+    "apiVersion": "core.oam.dev/v1alpha1",
+    "kind": "TraitDefinition",
+    "metadata": {
+        "name": "automaticSidecarInjection.OSM"
+    },
+    "spec": {
+        "appliesToWorkloads": ["OSMMesh"],
+        "definitionRef": {
+            "name": "automaticsidecarinjection.OSM.meshery.layer5.io"
+        },
+        "revisionEnabled": false
+    }
+}
