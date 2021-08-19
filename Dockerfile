@@ -15,5 +15,6 @@ ENV GOARCH="amd64"
 ENV SERVICE_ADDR="meshery-osm"
 ENV MESHERY_SERVER="http://meshery:9081"
 WORKDIR /
+COPY templates/ ./templates
 COPY --from=build-env /github.com/layer5io/meshery-osm/meshery-osm .
 ENTRYPOINT ["/meshery-osm"]
