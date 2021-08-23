@@ -61,7 +61,7 @@ func (h *Handler) applyHelmChart(del bool, version, namespace string) error {
 		ChartLocation: mesherykube.HelmChartLocation{
 			Repository: repo,
 			Chart:      chart,
-			AppVersion: version,
+			Version: version,
 		},
 		Namespace:       namespace,
 		Delete:          del,
