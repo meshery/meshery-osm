@@ -18,8 +18,8 @@ import (
 	"context"
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
-	"github.com/layer5io/meshery-adapter-library/config"
 	"github.com/layer5io/meshery-osm/osm/oam"
+	meshkitCfg "github.com/layer5io/meshkit/config"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/models/oam/core/v1alpha1"
 )
@@ -30,7 +30,7 @@ type Handler struct {
 }
 
 // New initializes a new handler instance
-func New(config config.Handler, log logger.Handler, kc config.Handler) adapter.Handler {
+func New(config meshkitCfg.Handler, log logger.Handler, kc meshkitCfg.Handler) adapter.Handler {
 	return &Handler{
 		Adapter: adapter.Adapter{
 			Config:            config,
