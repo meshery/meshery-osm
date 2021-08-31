@@ -3,10 +3,11 @@ package config
 import (
 	"path"
 
+	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/common"
 	"github.com/layer5io/meshery-adapter-library/config"
-	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
 	"github.com/layer5io/meshery-adapter-library/status"
+	configprovider "github.com/layer5io/meshkit/config/provider"
 	"github.com/layer5io/meshkit/utils"
 	smp "github.com/layer5io/service-mesh-performance/spec"
 )
@@ -24,13 +25,13 @@ var (
 		"name":     smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String(),
 		"type":     "adapter",
 		"port":     "10009",
-		"traceurl": "none",
+		"traceurl": status.None,
 	}
 
 	MeshSpecDefaults = map[string]string{
 		"name":    smp.ServiceMesh_OPEN_SERVICE_MESH.Enum().String(),
 		"status":  status.NotInstalled,
-		"version": "none",
+		"version": status.None,
 	}
 
 	ProviderConfigDefaults = map[string]string{
@@ -48,28 +49,51 @@ var (
 	OperationsDefaults = getOperations(common.Operations)
 )
 
-func New(provider string) (config.Handler, error) {
+func New(provider string) (h config.Handler, err error) {
 	opts := configprovider.Options{
-		ServerConfig:   ServerDefaults,
-		MeshSpec:       MeshSpecDefaults,
-		ProviderConfig: ProviderConfigDefaults,
-		Operations:     OperationsDefaults,
+		FilePath: configRootPath,
+		FileName: "osm",
+		FileType: "yaml",
 	}
 	switch provider {
 	case configprovider.ViperKey:
-		return configprovider.NewViper(opts)
+		h, err = configprovider.NewViper(opts)
+		if err != nil {
+			return nil, err
+		}
 	case configprovider.InMemKey:
-		return configprovider.NewInMem(opts)
+		h, err = configprovider.NewInMem(opts)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, ErrEmptyConfig
 	}
-	return nil, config.ErrEmptyConfig
+	// Setup server config
+	if err := h.SetObject(adapter.ServerKey, ServerDefaults); err != nil {
+		return nil, err
+	}
+
+	// Setup mesh config
+	if err := h.SetObject(adapter.MeshSpecKey, MeshSpecDefaults); err != nil {
+		return nil, err
+	}
+
+	// Setup Operations Config
+	if err := h.SetObject(adapter.OperationsKey, OperationsDefaults); err != nil {
+		return nil, err
+	}
+
+	return h, nil
 }
 
 func NewKubeconfigBuilder(provider string) (config.Handler, error) {
 
-	opts := configprovider.Options{}
-
-	// Config environment
-	opts.ProviderConfig = KubeConfigDefaults
+	opts := configprovider.Options{
+		FilePath: configRootPath,
+		FileType: "yaml",
+		FileName: "kubeconfig",
+	}
 
 	// Config provider
 	switch provider {

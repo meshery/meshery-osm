@@ -23,10 +23,10 @@ import (
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
-	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
 	"github.com/layer5io/meshery-osm/osm/oam"
+	configprovider "github.com/layer5io/meshkit/config/provider"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
 )
