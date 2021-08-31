@@ -75,8 +75,8 @@ func main() {
 	service.Version = version
 	service.GitSHA = gitsha
 
-	go registerCapabilities(service.Port, log)
-
+	go registerCapabilities(service.Port, log)        //Registering static capabilities
+	go registerDynamicCapabilities(service.Port, log) //Registering latest capabilities periodically
 	// Server Initialization
 	log.Info("Adaptor Listening at port: ", service.Port)
 	err = grpc.Start(service, nil)
@@ -136,4 +136,25 @@ func registerCapabilities(port string, log logger.Handler) {
 	if err := oam.RegisterTraits(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
 		log.Info(err.Error())
 	}
+}
+
+func registerDynamicCapabilities(port string, log logger.Handler) {
+	registerWorkloads(port, log)
+	//Start the ticker
+	const reRegisterAfter = 24
+	ticker := time.NewTicker(reRegisterAfter * time.Hour)
+	for {
+		<-ticker.C
+		registerWorkloads(port, log)
+	}
+
+}
+func registerWorkloads(port string, log logger.Handler) {
+	log.Info("Registering latest workload components")
+	// Register workloads
+	if err := oam.RegisterWorkLoadsDynamically(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
+		log.Info(err.Error())
+		return
+	}
+	log.Info("Latest workload components successfully registered.")
 }

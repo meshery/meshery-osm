@@ -1,13 +1,21 @@
 package oam
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/cenkalti/backoff"
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-osm/internal/config"
+	"github.com/layer5io/meshkit/utils/kubernetes"
+	"github.com/layer5io/meshkit/utils/manifests"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -116,4 +124,91 @@ func load(basePath string) ([]schemaDefinitionPathSet, error) {
 	}
 
 	return res, nil
+}
+
+//RegisterWorkLoadsDynamically
+func RegisterWorkLoadsDynamically(runtime, host string) error {
+	appversion, chartVersion, err := getLatestValidAppVersionAndChartVersion()
+	if err != nil {
+		return err
+	}
+	m := manifests.Config{
+		Name:        "OSM",
+		MeshVersion: appversion,
+		Filter: manifests.CrdFilter{
+			RootFilter:    []string{"$[?(@.kind==\"CustomResourceDefinition\")]"},
+			NameFilter:    []string{"$..[\"spec\"][\"names\"][\"kind\"]"},
+			VersionFilter: []string{"$..spec.versions[0]", " --o-filter", "$[0]"},
+			GroupFilter:   []string{"$..spec", " --o-filter", "$[]"},
+			SpecFilter:    []string{"$..openAPIV3Schema.properties.spec", " --o-filter", "$[]"},
+		},
+	}
+	url := "https://openservicemesh.github.io/osm/osm-" + chartVersion + ".tgz"
+	fmt.Println("version ", chartVersion)
+	comp, err := manifests.GetFromHelm(url, manifests.SERVICE_MESH, m)
+	for i, def := range comp.Definitions {
+
+		var ord adapter.OAMRegistrantData
+		ord.OAMRefSchema = comp.Schemas[i]
+
+		//Marshalling the stringified json
+		ord.Host = host
+		definitionMap := map[string]interface{}{}
+		if err := json.Unmarshal([]byte(def), &definitionMap); err != nil {
+			return err
+		}
+		// To be shifted in meshkit
+		definitionMap["apiVersion"] = "core.oam.dev/v1alpha1"
+		definitionMap["kind"] = "WorkloadDefinition"
+		ord.OAMDefinition = definitionMap
+		ord.Metadata = map[string]string{
+			config.OAMAdapterNameMetadataKey: config.OSMOperation,
+		}
+		// send request to the register
+		backoffOpt := backoff.NewExponentialBackOff()
+		backoffOpt.MaxElapsedTime = 10 * time.Minute
+		if err := backoff.Retry(func() error {
+			contentByt, err := json.Marshal(ord)
+			if err != nil {
+				return backoff.Permanent(err)
+			}
+			content := bytes.NewReader(contentByt)
+			// host here is given by the application itself and is trustworthy hence,
+			// #nosec
+			resp, err := http.Post(fmt.Sprintf("%s/api/oam/workload", runtime), "application/json", content)
+			if err != nil {
+				return err
+			}
+			if resp.StatusCode != http.StatusCreated &&
+				resp.StatusCode != http.StatusOK &&
+				resp.StatusCode != http.StatusAccepted {
+				return fmt.Errorf(
+					"register process failed, host returned status: %s with status code %d",
+					resp.Status,
+					resp.StatusCode,
+				)
+			}
+
+			return nil
+		}, backoffOpt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// returns latest valid appversion and chartversion
+func getLatestValidAppVersionAndChartVersion() (string, string, error) {
+	release, err := config.GetLatestReleases(10)
+	if err != nil {
+		return "", "", errors.Wrap(err, "Could not get latest stable release")
+	}
+	//loops through latest 10 app versions untill it finds one which is available in helm chart's index.yaml
+	for _, rel := range release {
+		if chartVersion, err := kubernetes.HelmAppVersionToChartVersion("https://openservicemesh.github.io/osm", "osm", rel.TagName); err == nil {
+			return rel.TagName, chartVersion, nil
+		}
+
+	}
+	return "", "", errors.New("Could not find latest stable release")
 }
