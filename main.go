@@ -31,7 +31,7 @@ import (
 	"github.com/layer5io/meshkit/utils"
 )
 
-const (
+var (
 	serviceName = "osm-adapter"
 	version     = "none"
 	gitsha      = "none"
