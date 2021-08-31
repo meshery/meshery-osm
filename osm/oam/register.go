@@ -146,6 +146,9 @@ func RegisterWorkLoadsDynamically(runtime, host string) error {
 	url := "https://openservicemesh.github.io/osm/osm-" + chartVersion + ".tgz"
 	fmt.Println("version ", chartVersion)
 	comp, err := manifests.GetFromHelm(url, manifests.SERVICE_MESH, m)
+	if err != nil {
+		return err
+	}
 	for i, def := range comp.Definitions {
 
 		var ord adapter.OAMRegistrantData
