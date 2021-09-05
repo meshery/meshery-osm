@@ -60,5 +60,5 @@ jobs:
           commit_user_email: ci@layer5.io
           commit_author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           commit_options: '--signoff'
-          commit_message: '[Docs] Error Code Reference: Updated codes for OSM adapter'
+          commit_message: '[Docs] Error Code Reference: Meshery Adapter for OSM updated'
           file_pattern: docs/
