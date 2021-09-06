@@ -24,11 +24,15 @@ import (
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
 	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
+	"github.com/layer5io/meshery-osm/internal/config"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
 	"github.com/layer5io/meshery-osm/osm/oam"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
+	"github.com/layer5io/meshkit/utils/kubernetes"
+	"github.com/layer5io/meshkit/utils/manifests"
+	smp "github.com/layer5io/service-mesh-performance/spec"
 )
 
 const (
@@ -149,12 +153,50 @@ func registerDynamicCapabilities(port string, log logger.Handler) {
 	}
 
 }
+
 func registerWorkloads(port string, log logger.Handler) {
-	log.Info("Registering latest workload components")
+	appVersion, chartVersion, err := getLatestValidAppVersionAndChartVersion()
+	if err != nil {
+		log.Info("Could not get latest version")
+		return
+	}
+	log.Info("Registering latest workload components for version ", appVersion)
 	// Register workloads
-	if err := oam.RegisterWorkLoadsDynamically(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
+	if err := adapter.RegisterWorkLoadsDynamically(mesheryServerAddress(), serviceAddress()+":"+port, &adapter.DynamicComponentsConfig{
+		TimeoutInMinutes: 60,
+		URL:              "https://openservicemesh.github.io/osm/osm-" + chartVersion + ".tgz",
+		GenerationMethod: adapter.HelmCHARTS,
+		Config: manifests.Config{
+			Name:        smp.ServiceMesh_Type_name[int32(smp.ServiceMesh_OPEN_SERVICE_MESH)],
+			MeshVersion: appVersion,
+			Filter: manifests.CrdFilter{
+				RootFilter:    []string{"$[?(@.kind==\"CustomResourceDefinition\")]"},
+				NameFilter:    []string{"$..[\"spec\"][\"names\"][\"kind\"]"},
+				VersionFilter: []string{"$..spec.versions[0]", " --o-filter", "$[0]"},
+				GroupFilter:   []string{"$..spec", " --o-filter", "$[]"},
+				SpecFilter:    []string{"$..openAPIV3Schema.properties.spec", " --o-filter", "$[]"},
+			},
+		},
+		Operation: config.OSMOperation,
+	}); err != nil {
 		log.Info(err.Error())
 		return
 	}
 	log.Info("Latest workload components successfully registered.")
+}
+
+// returns latest valid appversion and chartversion
+func getLatestValidAppVersionAndChartVersion() (string, string, error) {
+	release, err := config.GetLatestReleases(100)
+	if err != nil {
+		return "", "", osm.ErrGetLatestRelease(err)
+	}
+	//loops through latest  app versions untill it finds one which is available in helm chart's index.yaml
+	for _, rel := range release {
+		if chartVersion, err := kubernetes.HelmAppVersionToChartVersion("https://openservicemesh.github.io/osm", "osm", rel.TagName); err == nil {
+			return rel.TagName, chartVersion, nil
+		}
+
+	}
+	return "", "", osm.ErrGetLatestRelease(err)
 }

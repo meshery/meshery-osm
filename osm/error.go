@@ -99,6 +99,11 @@ var (
 	// ErrParseOAMConfig represents the error which is
 	// generated during the OAM configuration parsing
 	ErrParseOAMConfig = errors.New(ErrParseOAMConfigCode, errors.Alert, []string{"error parsing the configuration"}, []string{"Error occured while prasing component config in the OAM request made"}, []string{"Invalid OAM config passed in OAM request"}, []string{"Check if your request has vaild OAM config"})
+
+	// ErrGetLatestReleaseCode represents the error which is
+	// generated when the latest stable version could not
+	// be fetched during runtime component registeration
+	ErrGetLatestReleaseCode = "1020"
 )
 
 // ErrInstallOSM is the error for install mesh
@@ -180,4 +185,9 @@ func ErrOSMCoreComponentFail(err error) error {
 // ErrProcessOAM is a generic error which is thrown when an OAM operations fails
 func ErrProcessOAM(err error) error {
 	return errors.New(ErrProcessOAMCode, errors.Alert, []string{"error performing OAM operations"}, []string{err.Error()}, []string{}, []string{})
+}
+
+// ErrGetLatestRelease is the error for get latest versions
+func ErrGetLatestRelease(err error) error {
+	return errors.New(ErrGetLatestReleaseCode, errors.Alert, []string{"Could not get latest version"}, []string{err.Error()}, []string{"Latest version could not be found at the specified url"}, []string{})
 }
