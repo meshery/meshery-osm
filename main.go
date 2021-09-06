@@ -23,11 +23,10 @@ import (
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
-	configprovider "github.com/layer5io/meshery-adapter-library/config/provider"
-	"github.com/layer5io/meshery-osm/internal/config"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
 	"github.com/layer5io/meshery-osm/osm/oam"
+	configprovider "github.com/layer5io/meshkit/config/provider"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
 	"github.com/layer5io/meshkit/utils/kubernetes"
@@ -177,7 +176,7 @@ func registerWorkloads(port string, log logger.Handler) {
 				SpecFilter:    []string{"$..openAPIV3Schema.properties.spec", " --o-filter", "$[]"},
 			},
 		},
-		Operation: config.OSMOperation,
+		Operation: internalconfig.OSMOperation,
 	}); err != nil {
 		log.Info(err.Error())
 		return
@@ -187,7 +186,7 @@ func registerWorkloads(port string, log logger.Handler) {
 
 // returns latest valid appversion and chartversion
 func getLatestValidAppVersionAndChartVersion() (string, string, error) {
-	release, err := config.GetLatestReleases(100)
+	release, err := internalconfig.GetLatestReleases(100)
 	if err != nil {
 		return "", "", osm.ErrGetLatestRelease(err)
 	}
