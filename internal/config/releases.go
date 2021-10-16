@@ -127,19 +127,19 @@ type treeslice struct {
 // TODO: Remove from here and use gitwalker from meshkit instead
 // GetFileNames takes the url of a github repo and the path to a directory. Then returns all the filenames from that directory
 func GetFileNames(url string, path string) ([]string, error) {
-	res, err := http.Get(url + "/commits") //url="https://api.github.com/repos/hashicorp/consul-k8s"
+	res, err := http.Get(url + "/commits") //url="https://api.github.com/repos/openservicemesh/osm"
 	if err != nil {
-		return nil, err
+		return nil, ErrGetManifestNames(err)
 	}
 	defer res.Body.Close()
 	content, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, ErrGetManifestNames(err)
 	}
 	var r []rootdir
 	err = json.Unmarshal(content, &r)
 	if err != nil {
-		return nil, err
+		return nil, ErrGetManifestNames(err)
 	}
 	shaurl := r[0].Commit.Tree.URL
 	bpath := strings.Split(path, "/")
