@@ -78,7 +78,7 @@ func main() {
 	service.Version = version
 	service.GitSHA = gitsha
 
-	// go registerCapabilities(service.Port, log)        //Registering static capabilities
+	go registerCapabilities(service.Port, log)        //Registering static capabilities
 	go registerDynamicCapabilities(service.Port, log) //Registering latest capabilities periodically
 	// Server Initialization
 	log.Info("Adaptor Listening at port: ", service.Port)
