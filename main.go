@@ -23,13 +23,13 @@ import (
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
+	"github.com/layer5io/meshery-osm/internal/config"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
 	"github.com/layer5io/meshery-osm/osm/oam"
 	configprovider "github.com/layer5io/meshkit/config/provider"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
-	"github.com/layer5io/meshkit/utils/kubernetes"
 	"github.com/layer5io/meshkit/utils/manifests"
 	smp "github.com/layer5io/service-mesh-performance/spec"
 )
@@ -78,7 +78,7 @@ func main() {
 	service.Version = version
 	service.GitSHA = gitsha
 
-	go registerCapabilities(service.Port, log)        //Registering static capabilities
+	// go registerCapabilities(service.Port, log)        //Registering static capabilities
 	go registerDynamicCapabilities(service.Port, log) //Registering latest capabilities periodically
 	// Server Initialization
 	log.Info("Adaptor Listening at port: ", service.Port)
@@ -154,52 +154,46 @@ func registerDynamicCapabilities(port string, log logger.Handler) {
 }
 
 func registerWorkloads(port string, log logger.Handler) {
-	appVersion, chartVersion, err := getLatestValidAppVersionAndChartVersion()
+	crds, err := config.GetFileNames("https://api.github.com/repos/openservicemesh/osm", "cmd/osm-bootstrap/crds")
 	if err != nil {
-		log.Info("Could not get latest version")
+		log.Error(err)
 		return
 	}
+	rel, err := config.GetLatestReleases(1)
+	if err != nil {
+		log.Info("Could not get latest version ", err.Error())
+		return
+	}
+	appVersion := rel[0].TagName
 	log.Info("Registering latest workload components for version ", appVersion)
 	// Register workloads
-	if err := adapter.RegisterWorkLoadsDynamically(mesheryServerAddress(), serviceAddress()+":"+port, &adapter.DynamicComponentsConfig{
-		TimeoutInMinutes: 60,
-		URL:              "https://openservicemesh.github.io/osm/osm-" + chartVersion + ".tgz",
-		GenerationMethod: adapter.HelmCHARTS,
-		Config: manifests.Config{
-			Name:        smp.ServiceMesh_Type_name[int32(smp.ServiceMesh_OPEN_SERVICE_MESH)],
-			MeshVersion: appVersion,
-			Filter: manifests.CrdFilter{
-				RootFilter:    []string{"$[?(@.kind==\"CustomResourceDefinition\")]"},
-				NameFilter:    []string{"$..[\"spec\"][\"names\"][\"kind\"]"},
-				VersionFilter: []string{"$[0]..spec.versions[0]"},
-				GroupFilter:   []string{"$[0]..spec"},
-				SpecFilter:    []string{"$[0]..openAPIV3Schema.properties.spec"},
-				ItrFilter:     []string{"$[?(@.spec.names.kind"},
-				ItrSpecFilter: []string{"$[?(@.spec.names.kind"},
-				VField:        "name",
-				GField:        "group",
+	for _, manifest := range crds {
+		log.Info("Registering for ", manifest)
+		if err := adapter.RegisterWorkLoadsDynamically(mesheryServerAddress(), serviceAddress()+":"+port, &adapter.DynamicComponentsConfig{
+			TimeoutInMinutes: 60,
+			URL:              "https://raw.githubusercontent.com/openservicemesh/osm/main/cmd/osm-bootstrap/crds/" + manifest,
+			GenerationMethod: adapter.Manifests,
+			Config: manifests.Config{
+				Name:        smp.ServiceMesh_Type_name[int32(smp.ServiceMesh_OPEN_SERVICE_MESH)],
+				MeshVersion: appVersion,
+				Filter: manifests.CrdFilter{
+					RootFilter:    []string{"$[?(@.kind==\"CustomResourceDefinition\")]"},
+					NameFilter:    []string{"$..[\"spec\"][\"names\"][\"kind\"]"},
+					VersionFilter: []string{"$[0]..spec.versions[0]"},
+					GroupFilter:   []string{"$[0]..spec"},
+					SpecFilter:    []string{"$[0]..openAPIV3Schema.properties.spec"},
+					ItrFilter:     []string{"$[?(@.spec.names.kind"},
+					ItrSpecFilter: []string{"$[?(@.spec.names.kind"},
+					VField:        "name",
+					GField:        "group",
+				},
 			},
-		},
-		Operation: internalconfig.OSMOperation,
-	}); err != nil {
-		log.Info(err.Error())
-		return
+			Operation: config.OSMOperation,
+		}); err != nil {
+			log.Error(err)
+			return
+		}
+		log.Info(manifest, " registered")
 	}
 	log.Info("Latest workload components successfully registered.")
-}
-
-// returns latest valid appversion and chartversion
-func getLatestValidAppVersionAndChartVersion() (string, string, error) {
-	release, err := internalconfig.GetLatestReleases(100)
-	if err != nil {
-		return "", "", osm.ErrGetLatestRelease(err)
-	}
-	//loops through latest  app versions untill it finds one which is available in helm chart's index.yaml
-	for _, rel := range release {
-		if chartVersion, err := kubernetes.HelmAppVersionToChartVersion("https://openservicemesh.github.io/osm", "osm", rel.TagName); err == nil {
-			return rel.TagName, chartVersion, nil
-		}
-
-	}
-	return "", "", osm.ErrGetLatestRelease(err)
 }
