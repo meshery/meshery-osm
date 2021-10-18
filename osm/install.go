@@ -56,15 +56,20 @@ func (h *Handler) applyHelmChart(del bool, version, namespace string) error {
 
 	repo := "https://openservicemesh.github.io/osm/"
 	chart := "osm"
-
+	var act mesherykube.HelmChartAction
+	if del {
+		act = mesherykube.UNINSTALL
+	} else {
+		act = mesherykube.INSTALL
+	}
 	return kClient.ApplyHelmChart(mesherykube.ApplyHelmChartConfig{
 		ChartLocation: mesherykube.HelmChartLocation{
 			Repository: repo,
 			Chart:      chart,
-			Version: version,
+			Version:    version,
 		},
 		Namespace:       namespace,
-		Delete:          del,
+		Action:          act,
 		CreateNamespace: true,
 	})
 }
