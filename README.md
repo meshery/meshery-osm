@@ -10,7 +10,7 @@
 [![Slack](https://img.shields.io/badge/Slack-@layer5.svg?logo=slack)](http://slack.layer5.io)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3564/badge)](https://bestpractices.coreinfrastructure.org/projects/3564)
 
-# Meshery Adapter for Open Service Mesh
+<h1>Meshery Adapter for Open Service Mesh</h1>
 <h2><a href="https://meshery.layer5.io/docs">Open Service Mesh</a></h2>
 <a href="https://openservicemesh.io">
  <img src="img/readme/osm.svg" style="margin:10px;" width="125px" 
