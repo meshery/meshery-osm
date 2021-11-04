@@ -154,11 +154,13 @@ func registerDynamicCapabilities(port string, log logger.Handler) {
 }
 
 func registerWorkloads(port string, log logger.Handler) {
+	log.Info("Fetching crd names for registering oam components...")
 	crds, err := config.GetFileNames("openservicemesh", "osm", "/cmd/osm-bootstrap/crds/**")
 	if err != nil {
 		log.Error(err)
 		return
 	}
+	log.Info("CRD names fetched successfully")
 	rel, err := config.GetLatestReleases(1)
 	if err != nil {
 		log.Info("Could not get latest version ", err.Error())
