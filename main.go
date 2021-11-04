@@ -154,7 +154,7 @@ func registerDynamicCapabilities(port string, log logger.Handler) {
 }
 
 func registerWorkloads(port string, log logger.Handler) {
-	crds, err := config.GetFileNames("https://api.github.com/repos/openservicemesh/osm", "cmd/osm-bootstrap/crds")
+	crds, err := config.GetFileNames("openservicemesh", "osm", "/cmd/osm-bootstrap/crds/**")
 	if err != nil {
 		log.Error(err)
 		return
