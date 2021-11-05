@@ -47,7 +47,7 @@ jobs:
         run: |
           mkdir ./osm-crds
           cd ./osm-crds
-          curl --remote-name-all `curl -H "Accept: application/vnd.github.VERSION.raw" https://api.github.com/repos/openservicemesh/osm/contents/charts/osm/crds\?ref\=$NEW_OSM_VERSION | jq 'map(.download_url) | .[]' | tr -d '"'`
+          curl --remote-name-all `curl -H "Accept: application/vnd.github.VERSION.raw" https://api.github.com/repos/openservicemesh/osm/contents/cmd/osm-bootstrap/crds\?ref\=$NEW_OSM_VERSION | jq 'map(.download_url) | .[]' | tr -d '"'`
           cd ..
           awk 'FNR==1 && NR>1 { printf("\n%s\n\n","---") } 1' osm-crds/*.yaml > ~/osm.yaml
       - name: Build jsonschema util
