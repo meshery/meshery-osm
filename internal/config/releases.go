@@ -113,7 +113,6 @@ func GetLatestReleases(releases uint) ([]*Release, error) {
 func appendThreadSafe(arr *[]string, s string, m *sync.RWMutex) {
 	m.Lock()
 	defer m.Unlock()
-	fmt.Println("PUSHING ", s)
 	*arr = append((*arr), s)
 }
 
