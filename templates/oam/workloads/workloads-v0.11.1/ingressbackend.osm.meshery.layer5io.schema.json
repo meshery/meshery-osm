@@ -1,0 +1,121 @@
+{
+  "type": "object",
+  "required": [
+    "backends",
+    "sources"
+  ],
+  "properties": {
+    "backends": {
+      "description": "Backends the IngressBackend policy is applicable to.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "port"
+        ],
+        "properties": {
+          "name": {
+            "description": "Name of the backend.",
+            "type": "string"
+          },
+          "port": {
+            "description": "Port of the backend.",
+            "type": "object",
+            "required": [
+              "number",
+              "protocol"
+            ],
+            "properties": {
+              "number": {
+                "description": "Port number of this port.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "protocol": {
+                "description": "Protocol served by this port.",
+                "type": "string"
+              }
+            }
+          },
+          "tls": {
+            "description": "TLS configuration for the backend.",
+            "type": "object",
+            "required": [
+              "skipClientCertValidation"
+            ],
+            "properties": {
+              "skipClientCertValidation": {
+                "description": "Skip client certificate validation.",
+                "type": "boolean"
+              },
+              "sniHosts": {
+                "description": "SNI hosts allowed by the backend.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sources": {
+      "description": "Sources the IngressBackend policy is applicable to.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "name"
+        ],
+        "properties": {
+          "kind": {
+            "description": "Kind of this source.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of this source.",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "Namespace of this source.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "matches": {
+      "description": "The resource references an IngressBackend policy should match on.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "apiGroup",
+          "kind",
+          "name"
+        ],
+        "properties": {
+          "apiGroup": {
+            "description": "API group for the resource being referenced.",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Type of resource being referenced.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of resource being referenced.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "version": "v0.11.1",
+  "object-type": "IngressBackend",
+  "service-mesh": "osm"
+}
