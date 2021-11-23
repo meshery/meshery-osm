@@ -104,6 +104,9 @@ var (
 	// generated when the latest stable version could not
 	// be fetched during runtime component registeration
 	ErrGetLatestReleaseCode = "1020"
+
+	//ErrLoadNamespaceCode occur during the process of applying namespace
+	ErrLoadNamespaceCode = "replace"
 )
 
 // ErrInstallOSM is the error for install mesh
@@ -191,3 +194,9 @@ func ErrProcessOAM(err error) error {
 func ErrGetLatestRelease(err error) error {
 	return errors.New(ErrGetLatestReleaseCode, errors.Alert, []string{"Could not get latest version"}, []string{err.Error()}, []string{"Latest version could not be found at the specified url"}, []string{})
 }
+
+// ErrLoadNamespace is the occurend while applying namespace
+func ErrLoadNamespace(err error, s string ) error{
+	return errors.New(ErrLoadNamespaceCode, errors.Alert, []string{"Error occured while applying namespace "}, []string{err.Error()}, []string{"Trying to access a namespace which is not available"}, []string{"Verify presence of namespace. Confirm Meshery ServiceAccount permissions"})
+
+} 
