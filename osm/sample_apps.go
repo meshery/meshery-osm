@@ -70,7 +70,7 @@ func (h *Handler) sidecarInjection(namespace string, del bool) error {
 	// updating the label on the namespace
 	ns, err := kclient.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
 	if err != nil {
-		return err
+		return ErrLoadNamespace(err, namespace)
 	}
 
 	if ns.ObjectMeta.Labels == nil {
@@ -96,7 +96,7 @@ func (h *Handler) sidecarInjection(namespace string, del bool) error {
 
 	_, err = kclient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
 	if err != nil {
-		return err
+		return ErrLoadNamespace(err, namespace)
 	}
 
 	return nil
