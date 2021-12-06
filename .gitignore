@@ -41,6 +41,7 @@ dist/
 */npm-debug.log
 
 Gemfile.lock
+default.profraw
 
 **/.idea
 docs/Gemfile.lock

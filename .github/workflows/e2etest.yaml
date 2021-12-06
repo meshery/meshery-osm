@@ -1,0 +1,47 @@
+name: Test OSM Adapter
+
+on:
+  push:
+    branches:
+      - "*"
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - "*"
+jobs:
+  SetPatterfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Get latest release tag
+        id: gettag
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: openservicemesh/osm
+          excludes: prerelease, draft
+      - name: Change service mesh version in patternfile
+        run: | 
+           
+           yq e -i '.services.osm.settings.version="${{ steps.gettag.outputs.release }}"' ./.github/install/deploy.yaml 
+           cat ./.github/install/deploy.yaml
+      - name: Uploading file
+        uses: actions/upload-artifact@v2
+        with:
+          name: patternfile
+          path: ./.github/install/deploy.yaml 
+
+  TestOSM:
+    needs: SetPatterfile
+    uses: meshery/meshery/.github/workflows/testadapters.yaml@master
+    with:
+      expected_pods: osm-bootstrap,osm-controller,osm-injector
+      expected_pods_namespaces: osm,osm,osm
+      deployment_url: https://raw.githubusercontent.com/meshery/meshery/master/install/deployment_yamls/k8s/meshery-osm-deployment.yaml
+      service_url: https://raw.githubusercontent.com/meshery/meshery/master/install/deployment_yamls/k8s/meshery-osm-service.yaml
+      adapter_name: osm
+      patternfile_name: deploy.yaml
+      provider: Local
+    secrets:
+      token: ${{ secrets.PROVIDER_TOKEN }} 
