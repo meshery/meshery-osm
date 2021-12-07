@@ -21,8 +21,10 @@ import (
 	"net/http"
 	"regexp"
 	"sort"
+	"sync"
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
+	"github.com/layer5io/meshkit/utils/walker"
 )
 
 // Release is used to save the release informations
@@ -106,4 +108,22 @@ func GetLatestReleases(releases uint) ([]*Release, error) {
 	}
 
 	return releaseList, nil
+}
+
+func appendThreadSafe(arr *[]string, s string, m *sync.RWMutex) {
+	m.Lock()
+	defer m.Unlock()
+	*arr = append((*arr), s)
+}
+
+// GetFileNames takes the url of a github repo and the path to a directory. Then returns all the filenames from that directory
+func GetFileNames(owner string, repo string, path string) ([]string, error) {
+	g := walker.NewGit()
+	var fs []string
+	var m sync.RWMutex
+	err := g.Owner(owner).Repo(repo).Branch("master").Root(path).RegisterFileInterceptor(func(f walker.File) error {
+		appendThreadSafe(&fs, f.Name, &m)
+		return nil
+	}).Walk()
+	return fs, err
 }

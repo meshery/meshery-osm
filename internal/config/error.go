@@ -30,6 +30,8 @@ const (
 	// ErrGetLatestReleaseNamesCode represents the error which occurs during the process of extracting
 	// release names
 	ErrGetLatestReleaseNamesCode = "1023"
+
+	ErrGetManifestNamesCode = "1024"
 )
 
 var (
@@ -45,4 +47,9 @@ func ErrGetLatestReleases(err error) error {
 // ErrGetLatestReleaseNames is the error for fetching nsm-mesh releases
 func ErrGetLatestReleaseNames(err error) error {
 	return errors.New(ErrGetLatestReleaseNamesCode, errors.Alert, []string{"Failed to extract release names"}, []string{err.Error()}, []string{}, []string{})
+}
+
+// ErrGetManifestNames is the error for fetching consul manifest names
+func ErrGetManifestNames(err error) error {
+	return errors.New(ErrGetManifestNamesCode, errors.Alert, []string{"Unable to fetch manifest names from github"}, []string{err.Error()}, []string{}, []string{})
 }
