@@ -17,7 +17,7 @@ var (
 
 func getOperations(op adapter.Operations) adapter.Operations {
 	var adapterVersions []adapter.Version
-	versions, _ := utils.GetLatestReleaseTagsSorted("istio", "istio")
+	versions, _ := utils.GetLatestReleaseTagsSorted("openservicemesh", "osm")
 	for _, v := range versions {
 		adapterVersions = append(adapterVersions, adapter.Version(v))
 	}
