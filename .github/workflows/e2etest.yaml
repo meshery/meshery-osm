@@ -14,6 +14,9 @@ on:
 jobs:
   SetPatterfile:
     runs-on: ubuntu-latest
+    outputs:
+      sm_version: ${{ steps.gettag.outputs.release }}
+      adapter_version:  ${{ env.version }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
