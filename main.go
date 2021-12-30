@@ -81,7 +81,7 @@ func main() {
 	go registerCapabilities(service.Port, log)        //Registering static capabilities
 	go registerDynamicCapabilities(service.Port, log) //Registering latest capabilities periodically
 	// Server Initialization
-	log.Info("Adaptor Listening at port: ", service.Port)
+	log.Info("adapter Listening at port: ", service.Port)
 	err = grpc.Start(service, nil)
 	if err != nil {
 		log.Error(grpc.ErrGrpcServer(err))
@@ -126,7 +126,7 @@ func serviceAddress() string {
 		return svcAddr
 	}
 
-	return "mesherylocal.layer5.io"
+	return "localhost"
 }
 
 func registerCapabilities(port string, log logger.Handler) {
