@@ -1,5 +1,5 @@
 {
-  "name": "osm",
+  "name": "meshery-osm",
   "type": "adapter",
   "next_error_code": 1025
 }
