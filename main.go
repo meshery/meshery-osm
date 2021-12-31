@@ -161,12 +161,12 @@ func registerWorkloads(port string, log logger.Handler) {
 		return
 	}
 	log.Info("CRD names fetched successfully")
-	rel, err := config.GetLatestReleases(1)
+	appVersions, err := utils.GetLatestReleaseTagsSorted("openservicemesh", "osm")
 	if err != nil {
 		log.Info("Could not get latest version ", err.Error())
 		return
 	}
-	appVersion := rel[0].TagName
+	appVersion := appVersions[len(appVersions)-1]
 	log.Info("Registering latest workload components for version ", appVersion)
 	// Register workloads
 	for _, manifest := range crds {

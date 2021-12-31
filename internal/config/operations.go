@@ -5,6 +5,7 @@ import (
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/meshes"
+	"github.com/layer5io/meshkit/utils"
 	smp "github.com/layer5io/service-mesh-performance/spec"
 )
 
@@ -15,12 +16,15 @@ var (
 )
 
 func getOperations(op adapter.Operations) adapter.Operations {
-	versions, _ := getLatestReleaseNames(3)
-
+	var adapterVersions []adapter.Version
+	versions, _ := utils.GetLatestReleaseTagsSorted("openservicemesh", "osm")
+	for _, v := range versions {
+		adapterVersions = append(adapterVersions, adapter.Version(v))
+	}
 	op[OSMOperation] = &adapter.Operation{
 		Type:        int32(meshes.OpCategory_INSTALL),
 		Description: "Open Service Mesh",
-		Versions:    versions,
+		Versions:    adapterVersions,
 		Templates: []adapter.Template{
 			"templates/open_service_mesh.yaml",
 		},
@@ -29,7 +33,7 @@ func getOperations(op adapter.Operations) adapter.Operations {
 	op[OSMBookStoreOperation] = &adapter.Operation{
 		Type:        int32(meshes.OpCategory_SAMPLE_APPLICATION),
 		Description: "Bookstore Application",
-		Versions:    versions,
+		Versions:    adapterVersions,
 		Templates: []adapter.Template{
 			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/bookbuyer.yaml",
 			"https://raw.githubusercontent.com/openservicemesh/osm/release-v0.6/docs/example/manifests/apps/bookstore-v1.yaml",
