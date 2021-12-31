@@ -81,7 +81,7 @@ func main() {
 	go registerCapabilities(service.Port, log)        //Registering static capabilities
 	go registerDynamicCapabilities(service.Port, log) //Registering latest capabilities periodically
 	// Server Initialization
-	log.Info("adapter Listening at port: ", service.Port)
+	log.Info("Adapter listening on port: ", service.Port)
 	err = grpc.Start(service, nil)
 	if err != nil {
 		log.Error(grpc.ErrGrpcServer(err))
