@@ -36,7 +36,7 @@ import (
 
 var (
 	serviceName = "osm-adapter"
-	version     = "none"
+	version     = "edge"
 	gitsha      = "none"
 )
 
