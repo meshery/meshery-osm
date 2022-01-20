@@ -1,0 +1,79 @@
+{
+ "properties": {
+  "clusters": {
+   "description": "The clusters the service accounts are hosted on.",
+   "items": {
+    "properties": {
+     "address": {
+      "description": "a routable IP + port",
+      "pattern": "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3}):[0-9]+$",
+      "type": "string"
+     },
+     "certificate": {
+      "description": "mTLS certificates (optional)",
+      "type": "string"
+     },
+     "name": {
+      "description": "Name of the remote cluster",
+      "type": "string"
+     },
+     "priority": {
+      "description": "Priority of the remote cluster in locality based load balancing",
+      "minimum": 0,
+      "type": "integer"
+     },
+     "weight": {
+      "default": 0,
+      "description": "Load balancing weight of the remote cluster",
+      "minimum": 0,
+      "type": "integer"
+     }
+    },
+    "required": [
+     "address",
+     "name"
+    ],
+    "type": "object"
+   },
+   "type": "array"
+  },
+  "ports": {
+   "description": "The list of ports that are exposed by this service.",
+   "items": {
+    "properties": {
+     "port": {
+      "description": "The port that will be exposed by this service.",
+      "maximum": 65535,
+      "minimum": 1,
+      "type": "integer"
+     },
+     "protocol": {
+      "default": "TCP",
+      "description": "The IP protocol for this port. Supports \"TCP\", \"UDP\", and \"SCTP\". Default is TCP.",
+      "enum": [
+       "TCP",
+       "UDP",
+       "SCTP"
+      ],
+      "type": "string"
+     }
+    },
+    "required": [
+     "port",
+     "protocol"
+    ],
+    "type": "object"
+   },
+   "type": "array"
+  },
+  "serviceAccount": {
+   "type": "string"
+  }
+ },
+ "required": [
+  "serviceAccount",
+  "clusters"
+ ],
+ "title": "Multi Cluster Service",
+ "type": "object"
+}
