@@ -1,0 +1,20 @@
+{
+ "kind": "WorkloadDefinition",
+ "apiVersion": "core.oam.dev/v1alpha1",
+ "metadata": {
+  "name": "HTTPRouteGroup",
+  "creationTimestamp": null
+ },
+ "spec": {
+  "definitionRef": {
+   "name": "httproutegroup.meshery.layer5.io"
+  },
+  "metadata": {
+   "@type": "pattern.meshery.io/mesh/workload",
+   "k8sAPIVersion": "specs.smi-spec.io/v1alpha4",
+   "k8sKind": "HTTPRouteGroup",
+   "meshName": "OPEN_SERVICE_MESH",
+   "meshVersion": "v0.11.2"
+  }
+ }
+}

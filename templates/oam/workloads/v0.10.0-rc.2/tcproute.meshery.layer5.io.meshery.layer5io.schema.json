@@ -1,0 +1,25 @@
+{
+ "properties": {
+  "matches": {
+   "description": "Match conditions of this route.",
+   "properties": {
+    "ports": {
+     "description": "Port numbers to match TCP traffic.",
+     "items": {
+      "type": "integer"
+     },
+     "type": "array"
+    }
+   },
+   "required": [
+    "ports"
+   ],
+   "type": "object"
+  }
+ },
+ "required": [
+  "matches"
+ ],
+ "title": "TCP Route",
+ "type": "object"
+}

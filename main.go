@@ -18,20 +18,19 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
-	"github.com/layer5io/meshery-osm/internal/config"
+	"github.com/layer5io/meshery-osm/build"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshery-osm/osm"
 	"github.com/layer5io/meshery-osm/osm/oam"
 	configprovider "github.com/layer5io/meshkit/config/provider"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
-	"github.com/layer5io/meshkit/utils/manifests"
-	smp "github.com/layer5io/service-mesh-performance/spec"
 )
 
 var (
@@ -154,48 +153,55 @@ func registerDynamicCapabilities(port string, log logger.Handler) {
 }
 
 func registerWorkloads(port string, log logger.Handler) {
-	log.Info("Fetching crd names for registering oam components...")
-	crds, err := config.GetFileNames("openservicemesh", "osm", "/cmd/osm-bootstrap/crds/**")
-	if err != nil {
-		log.Error(err)
+
+	//First we create and store any new components if available
+	version := build.LatestVersion
+	gm := build.DefaultGenerationMethod
+	// Prechecking to skip comp gen
+	if os.Getenv("FORCE_DYNAMIC_REG") != "true" && oam.AvailableVersions[version] {
+		log.Info("Components available statically for version ", version, ". Skipping dynamic component registeration")
 		return
 	}
-	log.Info("CRD names fetched successfully")
-	appVersions, err := utils.GetLatestReleaseTagsSorted("openservicemesh", "osm")
-	if err != nil {
-		log.Info("Could not get latest version ", err.Error())
-		return
+	//If a URL is passed from env variable, it will be used for component generation with default method being "using manifests"
+	// In case a helm chart URL is passed, COMP_GEN_METHOD env variable should be set to Helm otherwise the component generation fails
+	if os.Getenv("COMP_GEN_URL") != "" && (os.Getenv("COMP_GEN_METHOD") == "Helm" || os.Getenv("COMP_GEN_METHOD") == "Manifest") {
+		build.OverrideURL = os.Getenv("COMP_GEN_URL")
+		gm = os.Getenv("COMP_GEN_METHOD")
+		log.Info("Registering workload components from url ", build.OverrideURL, " using ", gm, " method...")
+		build.CRDnames = []string{"user passed configuration"}
 	}
-	appVersion := appVersions[len(appVersions)-1]
-	log.Info("Registering latest workload components for version ", appVersion)
+	log.Info("Registering latest workload components for version ", version)
 	// Register workloads
-	for _, manifest := range crds {
-		log.Info("Registering for ", manifest)
-		if err := adapter.RegisterWorkLoadsDynamically(mesheryServerAddress(), serviceAddress()+":"+port, &adapter.DynamicComponentsConfig{
-			TimeoutInMinutes: 60,
-			URL:              "https://raw.githubusercontent.com/openservicemesh/osm/main/cmd/osm-bootstrap/crds/" + manifest,
-			GenerationMethod: adapter.Manifests,
-			Config: manifests.Config{
-				Name:        smp.ServiceMesh_Type_name[int32(smp.ServiceMesh_OPEN_SERVICE_MESH)],
-				MeshVersion: appVersion,
-				Filter: manifests.CrdFilter{
-					RootFilter:    []string{"$[?(@.kind==\"CustomResourceDefinition\")]"},
-					NameFilter:    []string{"$..[\"spec\"][\"names\"][\"kind\"]"},
-					VersionFilter: []string{"$[0]..spec.versions[0]"},
-					GroupFilter:   []string{"$[0]..spec"},
-					SpecFilter:    []string{"$[0]..openAPIV3Schema.properties.spec"},
-					ItrFilter:     []string{"$[?(@.spec.names.kind"},
-					ItrSpecFilter: []string{"$[?(@.spec.names.kind"},
-					VField:        "name",
-					GField:        "group",
-				},
-			},
-			Operation: config.OSMOperation,
+	for _, crd := range build.CRDnames {
+		log.Info("Generating components for ", crd)
+		if err := adapter.CreateComponents(adapter.StaticCompConfig{
+			URL:     build.GetDefaultURL(crd),
+			Method:  gm,
+			Path:    build.WorkloadPath,
+			DirName: version,
+			Config:  build.NewConfig(version),
 		}); err != nil {
 			log.Error(err)
 			return
 		}
-		log.Info(manifest, " registered")
+		log.Info(crd, " created")
 	}
+
+	//*The below log is checked in the workflows. If you change this log, reflect that change in the workflow where components are generated
+	log.Info("Component creation completed for version ", version)
+
+	//Now we will register in case
+	log.Info("Registering workloads with Meshery Server for version ", version)
+	originalPath := oam.WorkloadPath
+	oam.WorkloadPath = filepath.Join(originalPath, version)
+	defer resetWorkloadPath(originalPath)
+	if err := oam.RegisterWorkloads(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
+		log.Info(err.Error())
+		return
+	}
+
 	log.Info("Latest workload components successfully registered.")
+}
+func resetWorkloadPath(orig string) {
+	oam.WorkloadPath = orig
 }

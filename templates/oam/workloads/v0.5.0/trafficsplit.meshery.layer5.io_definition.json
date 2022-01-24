@@ -1,0 +1,20 @@
+{
+ "kind": "WorkloadDefinition",
+ "apiVersion": "core.oam.dev/v1alpha1",
+ "metadata": {
+  "name": "TrafficSplit",
+  "creationTimestamp": null
+ },
+ "spec": {
+  "definitionRef": {
+   "name": "trafficsplit.meshery.layer5.io"
+  },
+  "metadata": {
+   "@type": "pattern.meshery.io/mesh/workload",
+   "k8sAPIVersion": "split.smi-spec.io/v1alpha4",
+   "k8sKind": "TrafficSplit",
+   "meshName": "OPEN_SERVICE_MESH",
+   "meshVersion": "v0.5.0"
+  }
+ }
+}
