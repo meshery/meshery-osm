@@ -117,4 +117,4 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: meshery/meshery-docker-extension  
-          readme-filepath: /install/docker-extension/README.md 
+          readme-filepath: README.md 
