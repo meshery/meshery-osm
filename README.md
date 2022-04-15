@@ -18,7 +18,7 @@
 </a>
 <p>
 <a href="https://openservicemesh.io">Open Service Mesh</a> (OSM) is a lightweight and extensible cloud native service mesh.
- <br /> <br /> <br /> <br /> <br />
+ <br /> <br /> <br /> <br /> <br /> 
 </p>
 
 <p style="clear:both;">
