@@ -43,8 +43,8 @@ jobs:
         echo "Env GIT_VERSION: ${{env.GIT_VERSION}}"
         echo "Env GIT_STRIPPED_VERSION: ${{env.GIT_STRIPPED_VERSION}}"
         echo "Env GIT_TAG: ${{ github.event.release.tag_name }}"
-        echo "Env GIT_REF: $GIT_REF"
-        echo "Env GIT_REF:" ${GIT_REF}
+        echo "Env GITHUB_REF: $GITHUB_REF"
+        echo "Env GITHUB_REF:" ${GITHUB_REF}
   
   docker-build:
     runs-on: ubuntu-latest
@@ -56,8 +56,8 @@ jobs:
         name: Identify Release Values
         if: "${{ github.event.inputs.release-ver}} != 'v' }}"
         run: |
-          echo "GIT_REF=${GIT_REF}"
-          if [[ ${GIT_REF} = refs/tags* ]]
+          echo "GITHUB_REF=${GITHUB_REF}"
+          if [[ ${GITHUB_REF} = refs/tags* ]]
           then
             echo RELEASE_CHANNEL=stable >> $GITHUB_ENV
           else
