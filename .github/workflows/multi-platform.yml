@@ -55,7 +55,7 @@ jobs:
         if: "${{ github.event.inputs.release-ver}} != 'v' }}"
         run: |
           echo "GIT_REF=${GIT_REF}"
-          if [[ $GIT_REF = refs/tags* ]]
+          if [[ ${GIT_REF} = refs/tags* ]]
           then
             echo RELEASE_CHANNEL=stable >> $GITHUB_ENV
           else
