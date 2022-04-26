@@ -106,7 +106,7 @@ var (
 	ErrGetLatestReleaseCode = "1020"
 
 	//ErrLoadNamespaceCode occur during the process of applying namespace
-	ErrLoadNamespaceCode = "1024"
+	ErrLoadNamespaceCode = "1021"
 )
 
 // ErrInstallOSM is the error for install mesh
