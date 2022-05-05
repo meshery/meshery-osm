@@ -1,0 +1,105 @@
+{
+ "properties": {
+  "provider": {
+   "description": "Certificate provider used by the mesh control plane",
+   "oneOf": [
+    {
+     "required": [
+      "certManager"
+     ]
+    },
+    {
+     "required": [
+      "vault"
+     ]
+    },
+    {
+     "required": [
+      "tresor"
+     ]
+    }
+   ],
+   "properties": {
+    "certManager": {
+     "description": "Cert-manager provider configuration",
+     "properties": {
+      "issuerGroup": {
+       "description": "The group that the issuer belongs to",
+       "type": "string"
+      },
+      "issuerKind": {
+       "description": "The kind of issuer resource",
+       "enum": [
+        "ClusterIssuer",
+        "Issuer"
+       ],
+       "type": "string"
+      },
+      "issuerName": {
+       "description": "The name of the Issuer or ClusterIssuer resource",
+       "type": "string"
+      },
+      "secretName": {
+       "description": "The name of the kubernetes secret containing the root certificate",
+       "type": "string"
+      }
+     },
+     "required": [
+      "secretName",
+      "issuerName",
+      "issuerKind",
+      "issuerGroup"
+     ],
+     "type": "object"
+    },
+    "tresor": {
+     "description": "Tresor provider configuration",
+     "properties": {
+      "secretName": {
+       "description": "Name of the kubernetes secret storing the root certificate",
+       "type": "string"
+      }
+     },
+     "required": [
+      "secretName"
+     ],
+     "type": "object"
+    },
+    "vault": {
+     "description": "Vault provider configuration",
+     "properties": {
+      "host": {
+       "description": "Host name for the Vault server",
+       "type": "string"
+      },
+      "protocol": {
+       "description": "Protocol for the Vault connection",
+       "type": "string"
+      },
+      "role": {
+       "description": "Role created on Vault server for the mesh control plane",
+       "type": "string"
+      },
+      "token": {
+       "description": "Token used by the mesh control plane",
+       "type": "string"
+      }
+     },
+     "required": [
+      "host",
+      "role",
+      "protocol",
+      "token"
+     ],
+     "type": "object"
+    }
+   },
+   "type": "object"
+  }
+ },
+ "required": [
+  "provider"
+ ],
+ "title": "Mesh Root Certificate",
+ "type": "object"
+}

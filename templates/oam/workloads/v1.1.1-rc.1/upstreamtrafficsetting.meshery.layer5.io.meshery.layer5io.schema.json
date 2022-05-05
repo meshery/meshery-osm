@@ -1,0 +1,60 @@
+{
+ "properties": {
+  "connectionSettings": {
+   "description": "Connection settings for the upstream host.",
+   "properties": {
+    "http": {
+     "description": "HTTP connection settings.",
+     "properties": {
+      "maxPendingRequests": {
+       "description": "Maximum number of pending HTTP/1.1 requests allowed.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxRequests": {
+       "description": "Maximum number of parallel HTTP requests allowed.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxRequestsPerConnection": {
+       "description": "Maximum number of HTTP requests per connection allowed.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxRetries": {
+       "description": "Maximum number of parallel retries allowed.",
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    },
+    "tcp": {
+     "description": "TCP connection settings.",
+     "properties": {
+      "connectTimeout": {
+       "description": "TCP connection timeout.",
+       "type": "string"
+      },
+      "maxConnections": {
+       "description": "Maximum number of TCP connections.",
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "type": "object"
+  },
+  "host": {
+   "description": "Upstream host the policy is applicabe to.",
+   "type": "string"
+  }
+ },
+ "required": [
+  "host"
+ ],
+ "title": "Upstream Traffic Setting",
+ "type": "object"
+}
