@@ -49,10 +49,11 @@ jobs:
 
   TestOSM:
     needs: SetPatternfile
-    uses: meshery/meshery/.github/workflows/testadapters.yaml@master
+    uses: meshery/meshery/.github/workflows/test_adapters.yaml@master
     with:
-      expected_pods: osm-bootstrap,osm-controller,osm-injector
-      expected_pods_namespaces: osm,osm,osm
+      expected_resources: osm-bootstrap,osm-controller,osm-injector
+      expected_resources_types: pod,pod,pod
+      expected_resources_namespaces: osm,osm,osm
       deployment_url: https://raw.githubusercontent.com/meshery/meshery/master/install/deployment_yamls/k8s/meshery-osm-deployment.yaml
       service_url: https://raw.githubusercontent.com/meshery/meshery/master/install/deployment_yamls/k8s/meshery-osm-service.yaml
       adapter_name: osm
@@ -112,9 +113,9 @@ jobs:
           service-mesh: OSM
           service-mesh-version: $(jq '.metadata.service_mesh_version' data.json)
           tests:
-            osm-bootstrap: $(jq '.pods_status."osm-bootstrap"' data.json)
-            osm-controller: $(jq '.pods_status."osm-controller"' data.json)
-            osm-injector:  $(jq '.pods_status."osm-injector"' data.json)
+            pod/osm-bootstrap: $(jq '.resources_status."pod/osm-bootstrap"' data.json)
+            pod/osm-controller: $(jq '.resources_status."pod/osm-controller"' data.json)
+            pod/osm-injector:  $(jq '.resources_status."pod/osm-injector"' data.json)
           overall-status: $(jq '."overall-status"' data.json)
           ---" >  test.md
           mv test.md $filename.md
