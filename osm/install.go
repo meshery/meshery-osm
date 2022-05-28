@@ -16,13 +16,14 @@ package osm
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/status"
 	mesherykube "github.com/layer5io/meshkit/utils/kubernetes"
 )
 
-func (h *Handler) installOSM(del bool, version, ns string) (string, error) {
+func (h *Handler) installOSM(del bool, version, ns string, kubeconfigs []string) (string, error) {
 	h.Log.Debug(fmt.Sprintf("Requested install of version: %s", version))
 	h.Log.Debug(fmt.Sprintf("Requested action is delete: %v", del))
 	h.Log.Debug(fmt.Sprintf("Requested action is in namespace: %s", ns))
@@ -38,7 +39,7 @@ func (h *Handler) installOSM(del bool, version, ns string) (string, error) {
 	}
 
 	h.Log.Info("Installing...")
-	err = h.applyHelmChart(del, version, ns)
+	err = h.applyHelmChart(del, version, ns, kubeconfigs)
 	if err != nil {
 		return st, ErrApplyHelmChart(err)
 	}
@@ -51,8 +52,7 @@ func (h *Handler) installOSM(del bool, version, ns string) (string, error) {
 	return st, nil
 }
 
-func (h *Handler) applyHelmChart(del bool, version, namespace string) error {
-	kClient := h.MesheryKubeclient
+func (h *Handler) applyHelmChart(del bool, version, namespace string, kubeconfigs []string) error {
 
 	repo := "https://openservicemesh.github.io/osm/"
 	chart := "osm"
@@ -62,14 +62,36 @@ func (h *Handler) applyHelmChart(del bool, version, namespace string) error {
 	} else {
 		act = mesherykube.INSTALL
 	}
-	return kClient.ApplyHelmChart(mesherykube.ApplyHelmChartConfig{
-		ChartLocation: mesherykube.HelmChartLocation{
-			Repository: repo,
-			Chart:      chart,
-			Version:    version,
-		},
-		Namespace:       namespace,
-		Action:          act,
-		CreateNamespace: true,
-	})
+	var wg sync.WaitGroup
+	var errs []error
+	for _, kubeconfig := range kubeconfigs {
+		wg.Add(1)
+		go func(kubeconfig string) {
+			defer wg.Done()
+			kClient, err := mesherykube.New([]byte(kubeconfig))
+			if err != nil {
+				errs = append(errs, err)
+				return
+			}
+			err = kClient.ApplyHelmChart(mesherykube.ApplyHelmChartConfig{
+				ChartLocation: mesherykube.HelmChartLocation{
+					Repository: repo,
+					Chart:      chart,
+					Version:    version,
+				},
+				Namespace:       namespace,
+				Action:          act,
+				CreateNamespace: true,
+			})
+			if err != nil {
+				errs = append(errs, err)
+				return
+			}
+		}(kubeconfig)
+	}
+	wg.Wait()
+	if len(errs) != 0 {
+		return mergeErrors(errs)
+	}
+	return nil
 }

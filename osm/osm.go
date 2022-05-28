@@ -33,15 +33,16 @@ type Handler struct {
 func New(config meshkitCfg.Handler, log logger.Handler, kc meshkitCfg.Handler) adapter.Handler {
 	return &Handler{
 		Adapter: adapter.Adapter{
-			Config:            config,
-			Log:               log,
-			KubeconfigHandler: kc,
+			Config: config,
+			Log:    log,
 		},
 	}
 }
 
 // ProcessOAM will handles the grpc invocation for handling OAM objects
-func (h *Handler) ProcessOAM(ctx context.Context, oamReq adapter.OAMRequest) (string, error) {
+func (h *Handler) ProcessOAM(ctx context.Context, oamReq adapter.OAMRequest, hchan *chan interface{}) (string, error) {
+	kubeconfigs := oamReq.K8sConfigs
+	h.SetChannel(hchan)
 	var comps []v1alpha1.Component
 	for _, acomp := range oamReq.OamComps {
 		comp, err := oam.ParseApplicationComponent(acomp)
@@ -61,13 +62,13 @@ func (h *Handler) ProcessOAM(ctx context.Context, oamReq adapter.OAMRequest) (st
 	// If operation is delete then first HandleConfiguration and then handle the deployment
 	if oamReq.DeleteOp {
 		// Process configuration
-		msg2, err := h.HandleApplicationConfiguration(config, oamReq.DeleteOp)
+		msg2, err := h.HandleApplicationConfiguration(config, oamReq.DeleteOp, kubeconfigs)
 		if err != nil {
 			return msg2, ErrProcessOAM(err)
 		}
 
 		// Process components
-		msg1, err := h.HandleComponents(comps, oamReq.DeleteOp)
+		msg1, err := h.HandleComponents(comps, oamReq.DeleteOp, kubeconfigs)
 		if err != nil {
 			return msg1 + "\n" + msg2, ErrProcessOAM(err)
 		}
@@ -76,13 +77,13 @@ func (h *Handler) ProcessOAM(ctx context.Context, oamReq adapter.OAMRequest) (st
 	}
 
 	// Process components
-	msg1, err := h.HandleComponents(comps, oamReq.DeleteOp)
+	msg1, err := h.HandleComponents(comps, oamReq.DeleteOp, kubeconfigs)
 	if err != nil {
 		return msg1, ErrProcessOAM(err)
 	}
 
 	// Process configuration
-	msg2, err := h.HandleApplicationConfiguration(config, oamReq.DeleteOp)
+	msg2, err := h.HandleApplicationConfiguration(config, oamReq.DeleteOp, kubeconfigs)
 	if err != nil {
 		return msg1 + "\n" + msg2, ErrProcessOAM(err)
 	}

@@ -11,7 +11,9 @@ import (
 )
 
 // ApplyOperation function contains the operation handlers
-func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationRequest) error {
+func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationRequest, hchan *chan interface{}) error {
+	h.SetChannel(hchan)
+	kubeconfigs := request.K8sConfigs
 	operations := make(adapter.Operations)
 	err := h.Config.GetObject(adapter.OperationsKey, &operations)
 	if err != nil {
@@ -29,7 +31,7 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 	case internalconfig.OSMOperation:
 		go func(hh *Handler, ee *adapter.Event) {
 			version := string(operations[request.OperationName].Versions[0])
-			stat, err := hh.installOSM(request.IsDeleteOperation, version, request.Namespace)
+			stat, err := hh.installOSM(request.IsDeleteOperation, version, request.Namespace, kubeconfigs)
 			if err != nil {
 				e.Summary = fmt.Sprintf("Error while %s Open service mesh", stat)
 				e.Details = err.Error()
@@ -47,7 +49,7 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 		common.EmojiVotoOperation:
 		go func(hh *Handler, ee *adapter.Event) {
 			appName := operations[request.OperationName].AdditionalProperties[common.ServiceName]
-			stat, err := hh.installSampleApp(request.IsDeleteOperation, request.Namespace, operations[request.OperationName].Templates)
+			stat, err := hh.installSampleApp(request.IsDeleteOperation, request.Namespace, operations[request.OperationName].Templates, kubeconfigs)
 			if err != nil {
 				e.Summary = fmt.Sprintf("Error while %s %s application", stat, appName)
 				e.Details = err.Error()
@@ -66,6 +68,7 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 				request.IsDeleteOperation,
 				version,
 				operations[request.OperationName].Templates,
+				kubeconfigs,
 			)
 			if err != nil {
 				e.Summary = fmt.Sprintf("Error while %s %s application", stat, appName)
