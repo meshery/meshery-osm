@@ -9,6 +9,9 @@ run:
 	go mod tidy; \
 	DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
+run-force-dynamic-reg:
+	FORCE_DYNAMIC_REG=true DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
+
 protoc-setup:
 	cd meshes
 	wget https://raw.githubusercontent.com/layer5io/meshery/master/meshes/meshops.proto
