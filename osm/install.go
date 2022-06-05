@@ -63,6 +63,7 @@ func (h *Handler) applyHelmChart(del bool, version, namespace string, kubeconfig
 		act = mesherykube.INSTALL
 	}
 	var wg sync.WaitGroup
+	var errMx sync.Mutex
 	var errs []error
 	for _, kubeconfig := range kubeconfigs {
 		wg.Add(1)
@@ -70,7 +71,9 @@ func (h *Handler) applyHelmChart(del bool, version, namespace string, kubeconfig
 			defer wg.Done()
 			kClient, err := mesherykube.New([]byte(kubeconfig))
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 			err = kClient.ApplyHelmChart(mesherykube.ApplyHelmChartConfig{
@@ -84,7 +87,9 @@ func (h *Handler) applyHelmChart(del bool, version, namespace string, kubeconfig
 				CreateNamespace: true,
 			})
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 		}(kubeconfig)

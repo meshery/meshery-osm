@@ -65,18 +65,24 @@ func (h *Handler) installSampleApp(del bool, namespace string, templates []adapt
 func (h *Handler) sidecarInjection(namespace string, del bool, kubeconfigs []string) error {
 	var wg sync.WaitGroup
 	var errs []error
+	var errMx sync.Mutex
 	for _, k8sconfig := range kubeconfigs {
 		wg.Add(1)
 		go func(k8sconfig string) {
+			defer wg.Done()
 			kClient, err := mesherykube.New([]byte(k8sconfig))
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 			// updating the label on the namespace
 			ns, err := kClient.KubeClient.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 
@@ -103,11 +109,14 @@ func (h *Handler) sidecarInjection(namespace string, del bool, kubeconfigs []str
 
 			_, err = kClient.KubeClient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 		}(k8sconfig)
 	}
+	wg.Wait()
 	if len(errs) != 0 {
 		return ErrLoadNamespace(mergeErrors(errs), namespace)
 	}
@@ -135,12 +144,16 @@ metadata:
 func (h *Handler) applyManifest(contents []byte, isDel bool, namespace string, kubeconfigs []string) error {
 	var wg sync.WaitGroup
 	var errs []error
+	var errMx sync.Mutex
 	for _, k8sconfig := range kubeconfigs {
 		wg.Add(1)
 		go func(k8sconfig string) {
+			defer wg.Done()
 			kClient, err := mesherykube.New([]byte(k8sconfig))
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 			err = kClient.ApplyManifest(contents, mesherykube.ApplyOptions{
@@ -149,11 +162,14 @@ func (h *Handler) applyManifest(contents []byte, isDel bool, namespace string, k
 				Delete:    isDel,
 			})
 			if err != nil {
+				errMx.Lock()
 				errs = append(errs, err)
+				errMx.Unlock()
 				return
 			}
 		}(k8sconfig)
 	}
+	wg.Wait()
 	if len(errs) != 0 {
 		return ErrLoadNamespace(mergeErrors(errs), namespace)
 	}
