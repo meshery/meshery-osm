@@ -21,8 +21,8 @@ import (
 	"github.com/layer5io/meshery-osm/osm/oam"
 	meshkitCfg "github.com/layer5io/meshkit/config"
 	"github.com/layer5io/meshkit/logger"
+	"github.com/layer5io/meshkit/models"
 	"github.com/layer5io/meshkit/models/oam/core/v1alpha1"
-	"github.com/layer5io/meskit/models"
 	"gopkg.in/yaml.v2"
 )
 
@@ -35,8 +35,9 @@ type Handler struct {
 func New(config meshkitCfg.Handler, log logger.Handler, kc meshkitCfg.Handler) adapter.Handler {
 	return &Handler{
 		Adapter: adapter.Adapter{
-			Config: config,
-			Log:    log,
+			Config:            config,
+			Log:               log,
+			KubeconfigHandler: kc,
 		},
 	}
 }
@@ -88,6 +89,10 @@ func (osm *Handler) CreateKubeconfigs(kubeconfigs []string) error {
 
 // ProcessOAM will handles the grpc invocation for handling OAM objects
 func (h *Handler) ProcessOAM(ctx context.Context, oamReq adapter.OAMRequest, hchan *chan interface{}) (string, error) {
+	err := h.CreateKubeconfigs(oamReq.K8sConfigs)
+	if err != nil {
+		return "", err
+	}
 	kubeconfigs := oamReq.K8sConfigs
 	h.SetChannel(hchan)
 	var comps []v1alpha1.Component
