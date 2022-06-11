@@ -9,10 +9,10 @@ import (
 )
 
 // CompHandler is the type for functions which can handle OAM components
-type CompHandler func(*Handler, v1alpha1.Component, bool) (string, error)
+type CompHandler func(*Handler, v1alpha1.Component, bool, []string) (string, error)
 
 // HandleComponents handles the processing of OAM components
-func (h *Handler) HandleComponents(comps []v1alpha1.Component, isDel bool) (string, error) {
+func (h *Handler) HandleComponents(comps []v1alpha1.Component, isDel bool, kubeconfigs []string) (string, error) {
 	var errs []error
 	var msgs []string
 
@@ -23,7 +23,7 @@ func (h *Handler) HandleComponents(comps []v1alpha1.Component, isDel bool) (stri
 	for _, comp := range comps {
 		fnc, ok := compFuncMap[comp.Spec.Type]
 		if !ok {
-			msg, err := handleOSMCoreComponent(h, comp, isDel, "", "")
+			msg, err := handleOSMCoreComponent(h, comp, isDel, "", "", kubeconfigs)
 			if err != nil {
 				errs = append(errs, err)
 				continue
@@ -33,7 +33,7 @@ func (h *Handler) HandleComponents(comps []v1alpha1.Component, isDel bool) (stri
 			continue
 		}
 
-		msg, err := fnc(h, comp, isDel)
+		msg, err := fnc(h, comp, isDel, kubeconfigs)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -50,14 +50,14 @@ func (h *Handler) HandleComponents(comps []v1alpha1.Component, isDel bool) (stri
 }
 
 // HandleApplicationConfiguration handles the processing of OAM application configuration
-func (h *Handler) HandleApplicationConfiguration(config v1alpha1.Configuration, isDel bool) (string, error) {
+func (h *Handler) HandleApplicationConfiguration(config v1alpha1.Configuration, isDel bool, kubeconfigs []string) (string, error) {
 	var errs []error
 	var msgs []string
 	for _, comp := range config.Spec.Components {
 		for _, trait := range comp.Traits {
 			if trait.Name == "automaticSidecarInjection.OSM" {
 				namespaces := castSliceInterfaceToSliceString(trait.Properties["namespaces"].([]interface{}))
-				if err := handleNamespaceLabel(h, namespaces, isDel); err != nil {
+				if err := handleNamespaceLabel(h, namespaces, isDel, kubeconfigs); err != nil {
 					errs = append(errs, err)
 				}
 			}
@@ -74,10 +74,10 @@ func (h *Handler) HandleApplicationConfiguration(config v1alpha1.Configuration, 
 
 }
 
-func handleNamespaceLabel(h *Handler, namespaces []string, isDel bool) error {
+func handleNamespaceLabel(h *Handler, namespaces []string, isDel bool, kubeconfigs []string) error {
 	var errs []error
 	for _, ns := range namespaces {
-		if err := h.sidecarInjection(ns, isDel); err != nil {
+		if err := h.sidecarInjection(ns, isDel, kubeconfigs); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -85,13 +85,13 @@ func handleNamespaceLabel(h *Handler, namespaces []string, isDel bool) error {
 	return mergeErrors(errs)
 }
 
-func handleComponentOSMMesh(h *Handler, comp v1alpha1.Component, isDel bool) (string, error) {
+func handleComponentOSMMesh(h *Handler, comp v1alpha1.Component, isDel bool, kubeconfigs []string) (string, error) {
 	// Get the osm version from the settings
 	// we are sure that the version of osm would be present
 	// because the configuration is already validated against the schema
 	version := comp.Spec.Settings["version"].(string)
 
-	msg, err := h.installOSM(isDel, version, comp.Namespace)
+	msg, err := h.installOSM(isDel, version, comp.Namespace, kubeconfigs)
 	if err != nil {
 		return fmt.Sprintf("%s: %s", comp.Name, msg), err
 	}
@@ -104,7 +104,8 @@ func handleOSMCoreComponent(
 	comp v1alpha1.Component,
 	isDel bool,
 	apiVersion,
-	kind string) (string, error) {
+	kind string,
+	kubeconfigs []string) (string, error) {
 	if apiVersion == "" {
 		apiVersion = getAPIVersionFromComponent(comp)
 		if apiVersion == "" {
@@ -143,7 +144,7 @@ func handleOSMCoreComponent(
 		msg = fmt.Sprintf("deleted %s config \"%s\" in namespace \"%s\"", kind, comp.Name, comp.Namespace)
 	}
 
-	return msg, h.applyManifest(yamlByt, isDel, comp.Namespace)
+	return msg, h.applyManifest(yamlByt, isDel, comp.Namespace, kubeconfigs)
 }
 
 func getAPIVersionFromComponent(comp v1alpha1.Component) string {
