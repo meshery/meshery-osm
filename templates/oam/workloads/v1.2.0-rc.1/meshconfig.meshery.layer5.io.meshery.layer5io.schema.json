@@ -1,0 +1,327 @@
+{
+ "properties": {
+  "certificate": {
+   "description": "Configuration for certificate management",
+   "properties": {
+    "certKeyBitSize": {
+     "description": "Sets the certificate key bit size for data plane certificates.",
+     "type": "integer"
+    },
+    "ingressGateway": {
+     "description": "Configuration for the ingress gateway's certificate",
+     "properties": {
+      "secret": {
+       "description": "Secret reference to store the certificate in",
+       "properties": {
+        "name": {
+         "description": "Name of the secret",
+         "type": "string"
+        },
+        "namespace": {
+         "description": "Namespace of the secret",
+         "type": "string"
+        }
+       },
+       "required": [
+        "name",
+        "namespace"
+       ],
+       "type": "object"
+      },
+      "subjectAltNames": {
+       "description": "Subject Alternative Names secured by the certificate",
+       "items": {
+        "type": "string"
+       },
+       "minItems": 1,
+       "type": "array"
+      },
+      "validityDuration": {
+       "description": "Certificate validity duration, represented as a sequence of decimal numbers each with optional fraction and a unit suffix",
+       "type": "string"
+      }
+     },
+     "required": [
+      "subjectAltNames",
+      "validityDuration",
+      "secret"
+     ],
+     "type": "object"
+    },
+    "serviceCertValidityDuration": {
+     "description": "Sets the service certificate validity duration, represented as a sequence of decimal numbers each with optional fraction and a unit suffix.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "serviceCertValidityDuration",
+    "certKeyBitSize"
+   ],
+   "type": "object"
+  },
+  "featureFlags": {
+   "description": "OSM feature flags",
+   "properties": {
+    "enableAsyncProxyServiceMapping": {
+     "type": "boolean"
+    },
+    "enableEgressPolicy": {
+     "type": "boolean"
+    },
+    "enableEnvoyActiveHealthChecks": {
+     "type": "boolean"
+    },
+    "enableIngressBackendPolicy": {
+     "type": "boolean"
+    },
+    "enableMulticlusterMode": {
+     "description": "DEPRECATED, no longer used",
+     "type": "boolean"
+    },
+    "enableRetryPolicy": {
+     "type": "boolean"
+    },
+    "enableSnapshotCacheMode": {
+     "type": "boolean"
+    },
+    "enableWASMStats": {
+     "type": "boolean"
+    }
+   },
+   "type": "object"
+  },
+  "observability": {
+   "description": "Configuration for observing the service mesh, including metrics, logs, tracing etc,.",
+   "properties": {
+    "enableDebugServer": {
+     "description": "Enables a debug endpoint on the osm-controller pod to list information regarding the mesh such as proxy connections, certificates, and SMI policies.",
+     "type": "boolean"
+    },
+    "osmLogLevel": {
+     "description": "Allows setting OSM control plane log level at runtime",
+     "type": "string"
+    },
+    "tracing": {
+     "description": "Configuration for distributed tracing",
+     "properties": {
+      "address": {
+       "description": "Address of Jaeger tracing deployment, if tracing is enabled.",
+       "type": "string"
+      },
+      "enable": {
+       "description": "Enables Jaeger tracing for the mesh.",
+       "type": "boolean"
+      },
+      "endpoint": {
+       "description": "Endpoint for tracing data, if tracing is enabled.",
+       "type": "string"
+      },
+      "port": {
+       "description": "Port on which tracing is enabled.",
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "type": "object"
+  },
+  "sidecar": {
+   "description": "Configuration for Envoy sidecar",
+   "properties": {
+    "cipherSuites": {
+     "description": "A list of ciphers that listener supports when negotiating TLS 1.0-1.2. This setting has no effect when negotiating TLS 1.3. For valid cipher names, see the latest OpenSSL ciphers manual page. E.g. https://www.openssl.org/docs/man1.1.1/apps/ciphers.html.",
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "configResyncInterval": {
+     "description": "Resync interval for regular proxy broadcast updates",
+     "type": "string"
+    },
+    "ecdhCurves": {
+     "description": "A list of ECDH curves that TLS connection supports. If not specified, the curves are [X25519, P-256] for non-FIPS build and P-256 for builds using BoringSSL FIPS.",
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "enablePrivilegedInitContainer": {
+     "description": "Enables privileged init containers for pods in mesh. When false, init containers only have NET_ADMIN.",
+     "type": "boolean"
+    },
+    "envoyImage": {
+     "description": "Image for the Envoy sidecar",
+     "type": "string"
+    },
+    "envoyWindowsImage": {
+     "description": "Image for the Envoy sidecar on Windows workers",
+     "type": "string"
+    },
+    "initContainerImage": {
+     "description": "Image for the init container",
+     "type": "string"
+    },
+    "localProxyMode": {
+     "default": "Localhost",
+     "description": "Sets the destination ip address the envoy proxy will use when connecting to the backend application. Acceptable values are [Localhost, PodIP]. The default value is Localhost",
+     "enum": [
+      "Localhost",
+      "PodIP"
+     ],
+     "type": "string"
+    },
+    "logLevel": {
+     "description": "Sets the logging verbosity of Envoy proxy sidecar, only applicable to newly created pods joining the mesh.",
+     "enum": [
+      "trace",
+      "debug",
+      "info",
+      "warning",
+      "warn",
+      "error",
+      "critical",
+      "off"
+     ],
+     "type": "string"
+    },
+    "maxDataPlaneConnections": {
+     "description": "Max allowed data plane sidecar connections",
+     "type": "integer"
+    },
+    "resources": {
+     "properties": {
+      "limits": {
+       "additionalProperties": true,
+       "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/",
+       "type": "object"
+      },
+      "requests": {
+       "additionalProperties": true,
+       "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/",
+       "type": "object"
+      }
+     },
+     "type": "object"
+    },
+    "tlsMaxProtocolVersion": {
+     "default": "TLSv1_3",
+     "description": "The maximum TLS protocol version that the sidecar supports. Valid TLS protocol versions are TLS_AUTO, TLSv1_0, TLSv1_1, TLSv1_2 and TLSv1_3.",
+     "enum": [
+      "TLS_AUTO",
+      "TLSv1_0",
+      "TLSv1_1",
+      "TLSv1_2",
+      "TLSv1_3"
+     ],
+     "type": "string"
+    },
+    "tlsMinProtocolVersion": {
+     "default": "TLSv1_2",
+     "description": "The minimum TLS protocol version that the sidecar supports. Valid TLS protocol versions are TLS_AUTO, TLSv1_0, TLSv1_1, TLSv1_2 and TLSv1_3.",
+     "enum": [
+      "TLS_AUTO",
+      "TLSv1_0",
+      "TLSv1_1",
+      "TLSv1_2",
+      "TLSv1_3"
+     ],
+     "type": "string"
+    }
+   },
+   "type": "object"
+  },
+  "traffic": {
+   "description": "Configuration for traffic management",
+   "properties": {
+    "enableEgress": {
+     "description": "Enables egress in the mesh",
+     "type": "boolean"
+    },
+    "enablePermissiveTrafficPolicyMode": {
+     "description": "True for allowing traffic to flow between client and service pods within the mesh without SMI traffic policies, i.e. no traffic policy enforcement in the mesh. If set to false, enables deny-all traffic policy in mesh i.e. an SMI Traffic Target is necessary for services to communicate.",
+     "type": "boolean"
+    },
+    "inboundExternalAuthorization": {
+     "description": "Configures external authorization for inbound and ingress connections.",
+     "properties": {
+      "address": {
+       "description": "Target destination endpoint that will handle external authorization.",
+       "type": "string"
+      },
+      "enable": {
+       "description": "Enables/disables the inbound external authorization policy if present.",
+       "type": "boolean"
+      },
+      "failureModeAllow": {
+       "description": "Allows specifying if traffic should succeed or fail if the external authorization endpoint fails to respond.",
+       "type": "boolean"
+      },
+      "port": {
+       "description": "Remote destination port for the external authorization endpoint.",
+       "maximum": 65535,
+       "minimum": 1,
+       "type": "integer"
+      },
+      "statPrefix": {
+       "default": "inboundExtAuthz",
+       "description": "String prefix for inbound external authorization related metrics.",
+       "type": "string"
+      },
+      "timeout": {
+       "default": "1s",
+       "description": "Defines the timeout to consider for the remote endpoint to reply in time.",
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "inboundPortExclusionList": {
+     "description": "Global list of ports to exclude from inbound traffic interception by the sidecar proxy.",
+     "items": {
+      "maximum": 65535,
+      "minimum": 1,
+      "type": "integer"
+     },
+     "type": "array"
+    },
+    "networkInterfaceExclusionList": {
+     "description": "NetworkInterfaceExclusionList defines a global list of network interface names to exclude from inbound and outbound traffic interception by the sidecar proxy.",
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "outboundIPRangeExclusionList": {
+     "description": "Global list of IP address ranges to exclude from outbound traffic interception by the sidecar proxy.",
+     "items": {
+      "pattern": "((?:\\d{1,3}\\.){3}\\d{1,3})\\/(\\d{1,2})$",
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "outboundIPRangeInclusionList": {
+     "description": "Global list of IP address ranges to include for outbound traffic interception by the sidecar proxy.",
+     "items": {
+      "pattern": "((?:\\d{1,3}\\.){3}\\d{1,3})\\/(\\d{1,2})$",
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "outboundPortExclusionList": {
+     "description": "Global list of ports to exclude from outbound traffic interception by the sidecar proxy.",
+     "items": {
+      "maximum": 65535,
+      "minimum": 1,
+      "type": "integer"
+     },
+     "type": "array"
+    }
+   },
+   "type": "object"
+  }
+ },
+ "title": "Mesh Config",
+ "type": "object"
+}
