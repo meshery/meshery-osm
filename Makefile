@@ -1,70 +1,79 @@
 
 
+# Copyright Meshery Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+include build/Makefile.core.mk
 include build/Makefile.show-help.mk
 
-GOPATH = $(shell go env GOPATH)
+#-----------------------------------------------------------------------------
+# Environment Setup
+#-----------------------------------------------------------------------------
+BUILDER=buildx-multi-arch
+ADAPTER=osm
 
-## Run Meshery Adapter.
-run:
-	go mod tidy -compat=1.17; \
-	DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
+v ?= 1.17.8 # Default go version to be used
 
-run-force-dynamic-reg:
-	FORCE_DYNAMIC_REG=true DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
-protoc-setup:
+#-----------------------------------------------------------------------------
+# Docker-based Builds
+#-----------------------------------------------------------------------------
+.PHONY: docker docker-run lint proto-setup proto error test run run-force-dynamic-reg
+
+
+## Lint check Golang
+lint:
+	golangci-lint run
+
+## Retrieve protos
+proto-setup:
 	cd meshes
 	wget https://raw.githubusercontent.com/layer5io/meshery/master/meshes/meshops.proto
 
-check: error
-	golangci-lint run
-
-check-clean-cache:
-	golangci-lint cache clean
-
+## Generate protos
 proto:	
 	protoc -I meshes/ meshes/meshops.proto --go_out=plugins=grpc:./meshes/
 
-## Build Docker Image for Meshery Adapter.
+## Build Adapter container image with "edge-latest" tag
 docker:
-	docker build -t layer5/meshery-osm .
+	DOCKER_BUILDKIT=1 docker build -t layer5/meshery-$(ADAPTER):$(RELEASE_CHANNEL)-latest .
 
-## Build and Run Docker Image for Meshery Adapter.
+## Run Adapter container with "edge-latest" tag
 docker-run:
-	(docker rm -f meshery-osm) || true
-	docker run --name meshery-osm -d \
+	(docker rm -f meshery-$(ADAPTER)) || true
+	docker run --name meshery-$(ADAPTER) -d \
 	-p 10009:10009 \
 	-e DEBUG=true \
-	layer5/meshery-osm
+	layer5/meshery-$(ADAPTER):$(RELEASE_CHANNEL)-latest
 
-# setup-adapter sets up a new adapter with the given name & port
-setup-adapter:
-	mv "osm" ${ADAPTER}
-	find . -type f -exec sed -i '' -e 's/osm/${ADAPTER}/g' {} +
-	find . -type f -exec sed -i '' -e 's/<port>/${PORT}/g' {} +
-	find . -type f -exec sed -i '' -e 's/<go_version>/${GO_VERSION}/g' {} +
+## Build and run Adapter locally
+run:
+	go$(v) mod tidy -compat=1.17; \
+	DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
-## Run all Go checks.
-go-all: go-tidy go-fmt go-vet golangci-lint
+## Build and run Adapter locally; force component registration
+run-force-dynamic-reg:
+	FORCE_DYNAMIC_REG=true DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
-go-fmt:
-	go fmt ./...
-
-go-vet:
-	go vet ./...
-
-go-tidy:
-	@echo "Executing go mod tidy"
-	go mod tidy
-
-golangci-lint: $(GOLANGCILINT)
-	@echo
-	$(GOPATH)/bin/golangci-lint run
-
+## Run Meshery Error utility
 error:
-	go run github.com/layer5io/meshkit/cmd/errorutil -d . update -i ./helpers -o ./helpers
+	go run github.com/layer5io/meshkit/cmd/errorutil -d . analyze -i ./helpers -o ./helpers
 
-$(GOLANGCILINT):
-	(cd /; GO111MODULE=on GOPROXY="direct" GOSUMDB=off go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.30.0)
-
-.PHONY: error golangci-lint tidy go-vet go-fmt go-all
+## Run Golang tests
+test:
+	export CURRENTCONTEXT="$(kubectl config current-context)" 
+	echo "current-context:" ${CURRENTCONTEXT} 
+	export KUBECONFIG="${HOME}/.kube/config"
+	echo "environment-kubeconfig:" ${KUBECONFIG}
+	GOPROXY=direct GOSUMDB=off GO111MODULE=on go test -v ./...
