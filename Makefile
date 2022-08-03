@@ -6,7 +6,7 @@ GOPATH = $(shell go env GOPATH)
 
 ## Run Meshery Adapter.
 run:
-	go mod tidy; \
+	go mod tidy -compat=1.17; \
 	DEBUG=true GOPROXY=direct GOSUMDB=off go run main.go
 
 run-force-dynamic-reg:
