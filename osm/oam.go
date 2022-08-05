@@ -91,9 +91,9 @@ func handleComponentOSMMesh(h *Handler, comp v1alpha1.Component, isDel bool, kub
 	// because the configuration is already validated against the schema
 	version := comp.Spec.Version
 	if version == "" {
-		return "", fmt.Errorf("pass valid version inside service for Istio installation")
+		return "", fmt.Errorf("pass valid version inside service for OSM installation")
 	}
-	//TODO: When no version is passed in service, use the latest istio version
+	//TODO: When no version is passed in service, use the latest OSM version
 
 	msg, err := h.installOSM(isDel, version, comp.Namespace, kubeconfigs)
 	if err != nil {
