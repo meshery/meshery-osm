@@ -9,6 +9,7 @@
 			"name": "osmmesh.meshery.layer5.io"
 		},
 		"metadata": {
+			"@type": "pattern.meshery.io/core",
 			"version": "v0.9.1"
 		}
 	}
