@@ -8,6 +8,7 @@ import (
 	"github.com/layer5io/meshery-adapter-library/common"
 	"github.com/layer5io/meshery-adapter-library/status"
 	internalconfig "github.com/layer5io/meshery-osm/internal/config"
+	"github.com/layer5io/meshkit/errors"
 )
 
 // ApplyOperation function contains the operation handlers
@@ -28,6 +29,8 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 		Operationid: request.OperationID,
 		Summary:     status.Deploying,
 		Details:     "Operation is not supported",
+		Component:   internalconfig.ServerDefaults["type"],
+		ComponentName: internalconfig.ServerDefaults["name"],
 	}
 
 	//deployment
@@ -37,9 +40,8 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 			version := string(operations[request.OperationName].Versions[0])
 			stat, err := hh.installOSM(request.IsDeleteOperation, version, request.Namespace, kubeconfigs)
 			if err != nil {
-				e.Summary = fmt.Sprintf("Error while %s Open service mesh", stat)
-				e.Details = err.Error()
-				hh.StreamErr(e, err)
+				summary := fmt.Sprintf("Error while %s Open service mesh", stat)
+				hh.streamErr(summary, e, err)
 				return
 			}
 			ee.Summary = fmt.Sprintf("Open service mesh %s successfully", stat)
@@ -55,9 +57,8 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 			appName := operations[request.OperationName].AdditionalProperties[common.ServiceName]
 			stat, err := hh.installSampleApp(request.IsDeleteOperation, request.Namespace, operations[request.OperationName].Templates, kubeconfigs)
 			if err != nil {
-				e.Summary = fmt.Sprintf("Error while %s %s application", stat, appName)
-				e.Details = err.Error()
-				hh.StreamErr(e, err)
+				summary := fmt.Sprintf("Error while %s %s application", stat, appName)	
+				hh.streamErr(summary, e, err)
 				return
 			}
 			ee.Summary = fmt.Sprintf("%s application %s successfully", appName, stat)
@@ -75,9 +76,8 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 				kubeconfigs,
 			)
 			if err != nil {
-				e.Summary = fmt.Sprintf("Error while %s %s application", stat, appName)
-				e.Details = err.Error()
-				hh.StreamErr(e, err)
+				summary := fmt.Sprintf("Error while %s %s application", stat, appName)
+				hh.streamErr(summary, e, err)
 				return
 			}
 			ee.Summary = fmt.Sprintf("%s application %s successfully", appName, stat)
@@ -98,9 +98,8 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 				Annotations: make(map[string]string),
 			})
 			if err != nil {
-				e.Summary = fmt.Sprintf("Error while %s %s test", status.Running, name)
-				e.Details = err.Error()
-				hh.StreamErr(e, err)
+				summary := fmt.Sprintf("Error while %s %s test", status.Running, name)	
+				hh.streamErr(summary ,e, err)
 				return
 			}
 			ee.Summary = fmt.Sprintf("%s test %s successfully", name, status.Completed)
@@ -108,7 +107,16 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 			hh.StreamInfo(e)
 		}(h, e)
 	default:
-		h.StreamErr(e, ErrOpInvalid)
+		h.streamErr("Invalid operation", e, ErrOpInvalid)
 	}
 	return nil
+}
+
+func(h *Handler) streamErr(summary string, e *adapter.Event, err error) {
+	e.Summary = summary
+	e.Details = err.Error()
+	e.ErrorCode = errors.GetCode(err)
+	e.ProbableCause = errors.GetCause(err)
+	e.SuggestedRemediation = errors.GetRemedy(err)
+	h.StreamErr(e, err)
 }
