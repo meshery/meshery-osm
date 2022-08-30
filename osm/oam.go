@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
+	"github.com/layer5io/meshery-adapter-library/meshes"
+	"github.com/layer5io/meshery-osm/internal/config"
 	"github.com/layer5io/meshkit/models/oam/core/v1alpha1"
 	"gopkg.in/yaml.v2"
 )
@@ -19,26 +22,40 @@ func (h *Handler) HandleComponents(comps []v1alpha1.Component, isDel bool, kubec
 	compFuncMap := map[string]CompHandler{
 		"OSMMesh": handleComponentOSMMesh,
 	}
-
+	stat1 := "deploying"
+	stat2 := "deployed"
+	if isDel {
+		stat1 = "removing"
+		stat2 = "removed"
+	}
 	for _, comp := range comps {
+		ee := &meshes.EventsResponse{
+			OperationId:   uuid.New().String(),
+			Component:     config.ServerDefaults["type"],
+			ComponentName: config.ServerDefaults["name"],
+		}
 		fnc, ok := compFuncMap[comp.Spec.Type]
 		if !ok {
 			msg, err := handleOSMCoreComponent(h, comp, isDel, "", "", kubeconfigs)
 			if err != nil {
+				h.streamErr(fmt.Sprintf("failed in %s %s", stat1, comp.Spec.Type), ee, err)
 				errs = append(errs, err)
 				continue
 			}
-
+			ee.Summary = fmt.Sprintf("%s: %s %s successfully", comp.Name, strings.TrimSuffix(comp.Spec.Type, ".OSM"), stat2)
+			ee.Details = fmt.Sprintf("The %s of type %s has been %s successfully", comp.Name, strings.TrimSuffix(comp.Spec.Type, ".OSM"), stat2)
 			msgs = append(msgs, msg)
 			continue
 		}
 
 		msg, err := fnc(h, comp, isDel, kubeconfigs)
 		if err != nil {
+			h.streamErr(fmt.Sprintf("failed in %s %s", stat1, strings.TrimSuffix(comp.Spec.Type, ".OSM")), ee, err)
 			errs = append(errs, err)
 			continue
 		}
-
+		ee.Summary = fmt.Sprintf("%s: %s %s successfully", comp.Name, strings.TrimSuffix(comp.Spec.Type, ".OSM"), stat2)
+		ee.Details = fmt.Sprintf("The %s of type %s has been %s successfully", comp.Name, strings.TrimSuffix(comp.Spec.Type, ".OSM"), stat2)
 		msgs = append(msgs, msg)
 	}
 
