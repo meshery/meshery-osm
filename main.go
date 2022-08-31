@@ -31,6 +31,7 @@ import (
 	configprovider "github.com/layer5io/meshkit/config/provider"
 	"github.com/layer5io/meshkit/logger"
 	"github.com/layer5io/meshkit/utils"
+	"github.com/layer5io/meshkit/utils/events"
 )
 
 var (
@@ -70,9 +71,9 @@ func main() {
 
 	service := &grpc.Service{}
 	_ = cfg.GetObject(adapter.ServerKey, &service)
-
-	service.Handler = osm.New(cfg, log, kubeconfigHandler)
-	service.Channel = make(chan interface{}, 100)
+	e := events.NewEventStreamer()
+	service.Handler = osm.New(cfg, log, kubeconfigHandler, e)
+	service.EventStreamer = e
 	service.StartedAt = time.Now()
 	service.Version = version
 	service.GitSHA = gitsha
