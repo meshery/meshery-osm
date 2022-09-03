@@ -1,0 +1,1 @@
+{"kind":"WorkloadDefinition","apiVersion":"core.oam.dev/v1alpha1","metadata":{"name":"OSMMesh","creationTimestamp":null},"spec":{"definitionRef":{"name":"osmmesh.meshery.layer5.io"},"metadata":{"@type":"pattern.meshery.io/core","version":"v1.2.1"}}}
