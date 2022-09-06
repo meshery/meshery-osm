@@ -20,10 +20,13 @@ var CRDnames []string
 var OverrideURL string
 var AllVersions []string
 
+const Component = "OSM"
+
 //NewConfig creates the configuration for creating components
 func NewConfig(version string) manifests.Config {
 	return manifests.Config{
 		Name:        smp.ServiceMesh_Type_name[int32(smp.ServiceMesh_OPEN_SERVICE_MESH)],
+		Type:        Component,
 		MeshVersion: version,
 		CrdFilter: manifests.NewCueCrdFilter(manifests.ExtractorPaths{
 			NamePath:    "spec.names.kind",

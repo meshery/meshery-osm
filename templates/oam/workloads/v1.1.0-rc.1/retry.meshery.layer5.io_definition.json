@@ -2,12 +2,12 @@
  "kind": "WorkloadDefinition",
  "apiVersion": "core.oam.dev/v1alpha1",
  "metadata": {
-  "name": "Retry",
+  "name": "Retry.OSM",
   "creationTimestamp": null
  },
  "spec": {
   "definitionRef": {
-   "name": "retry.meshery.layer5.io"
+   "name": "retry.osm.meshery.layer5.io"
   },
   "metadata": {
    "@type": "pattern.meshery.io/mesh/workload",

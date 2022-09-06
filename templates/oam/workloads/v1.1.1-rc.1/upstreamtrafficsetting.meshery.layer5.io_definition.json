@@ -2,12 +2,12 @@
  "kind": "WorkloadDefinition",
  "apiVersion": "core.oam.dev/v1alpha1",
  "metadata": {
-  "name": "UpstreamTrafficSetting",
+  "name": "UpstreamTrafficSetting.OSM",
   "creationTimestamp": null
  },
  "spec": {
   "definitionRef": {
-   "name": "upstreamtrafficsetting.meshery.layer5.io"
+   "name": "upstreamtrafficsetting.osm.meshery.layer5.io"
   },
   "metadata": {
    "@type": "pattern.meshery.io/mesh/workload",
