@@ -1,4 +1,5 @@
-FROM golang:1.17 as build-env
+# syntax=docker/dockerfile:1
+FROM golang:1.19 as build-env
 ARG VERSION
 ARG GIT_COMMITSHA
 WORKDIR /github.com/layer5io/meshery-osm
@@ -9,7 +10,6 @@ COPY internal/ internal/
 COPY osm/ osm/
 COPY build/ build/
 RUN GOPROXY=https://proxy.golang.org,direct CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -ldflags="-w -s -X main.version=$VERSION -X main.gitsha=$GIT_COMMITSHA" -a -o meshery-osm main.go
-
 FROM gcr.io/distroless/nodejs:16
 ENV DISTRO="debian"
 ENV SERVICE_ADDR="meshery-osm"

@@ -88,7 +88,6 @@ func (h *Handler) HandleApplicationConfiguration(config v1alpha1.Configuration, 
 	}
 
 	return mergeMsgs(msgs), nil
-
 }
 
 func handleNamespaceLabel(h *Handler, namespaces []string, isDel bool, kubeconfigs []string) error {
