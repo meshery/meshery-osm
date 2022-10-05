@@ -1,4 +1,4 @@
-name: Meshery Adapter for OSM Tests
+name: E2E Test Meshery OSM Adapter
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       adapter_version:  ${{ env.version }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Get version of adapter
         run: |
             if [ ${{ github.event_name }} == "release" ];then
@@ -81,7 +81,7 @@ jobs:
             if [ "${{github.event_name }}" == "release" ];then
               echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
             fi
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
         with:
           repository: meshery/meshery 
           token: ${{ secrets.GH_ACCESS_TOKEN }}   

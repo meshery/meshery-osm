@@ -150,11 +150,9 @@ func registerDynamicCapabilities(port string, log logger.Handler) {
 		<-ticker.C
 		registerWorkloads(port, log)
 	}
-
 }
 
 func registerWorkloads(port string, log logger.Handler) {
-
 	//First we create and store any new components if available
 	version := build.LatestVersion
 	gm := build.DefaultGenerationMethod

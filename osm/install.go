@@ -53,7 +53,6 @@ func (h *Handler) installOSM(del bool, version, ns string, kubeconfigs []string)
 }
 
 func (h *Handler) applyHelmChart(del bool, version, namespace string, kubeconfigs []string) error {
-
 	repo := "https://openservicemesh.github.io/osm/"
 	chart := "osm"
 	var act mesherykube.HelmChartAction
