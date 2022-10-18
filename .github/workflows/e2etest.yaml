@@ -22,7 +22,7 @@ jobs:
       adapter_version:  ${{ env.version }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
       - name: Get version of adapter
         run: |
             if [ ${{ github.event_name }} == "release" ];then
@@ -81,7 +81,7 @@ jobs:
             if [ "${{github.event_name }}" == "release" ];then
               echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
             fi
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@master
         with:
           repository: meshery/meshery 
           token: ${{ secrets.GH_ACCESS_TOKEN }}   
