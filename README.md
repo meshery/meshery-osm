@@ -6,7 +6,7 @@
  
 [![Docker Pulls](https://img.shields.io/docker/pulls/layer5/meshery-osm.svg)](https://hub.docker.com/r/layer5/meshery-osm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/layer5io/meshery-osm)](https://goreportcard.com/report/github.com/layer5io/meshery-osm)
-[![Build Status](https://github.com/layer5io/meshery-osm/workflows/Meshery%20OSM/badge.svg)](https://github.com/layer5io/meshery-osm/actions)
+[![Build Status](https://img.shields.io/github/workflow/status/meshery/meshery-osm/Multi-Platform%20Build%20and%20Release)](https://github.com/layer5io/meshery-osm/actions)
 [![GitHub](https://img.shields.io/github/license/layer5io/meshery-osm.svg)](LICENSE)
 [![GitHub issues by-label](https://img.shields.io/github/issues/layer5io/meshery-osm/help%20wanted.svg)](https://github.com/layer5io/meshery-osm/issues?q=is%3Aopen+is%3Aissue+label%3A"help+wanted")
 [![Website](https://img.shields.io/website/https/layer5.io/meshery.svg)](https://layer5.io/meshery/)
@@ -38,9 +38,9 @@ alt="Meshery - the Service Mesh Management Plane" align="left" /></a>
 <h2><a name="contributing"></a><a name="community"></a> <a href="http://slack.layer5.io">Community</a> and <a href="https://github.com/layer5io/layer5/blob/master/CONTRIBUTING.md">Contributing</a></h2>
 Our projects are community-built and welcome collaboration. 👍 Be sure to see the <a href="https://docs.google.com/document/d/17OPtDE_rdnPQxmk2Kauhm3GwXF1R5dZ3Cj8qZLKdo5E/edit">Layer5 Community Welcome Guide</a> for a tour of resources available to you and jump into our <a href="http://slack.layer5.io">Slack</a>! Contributors are expected to adhere to the <a href="https://github.com/cncf/foundation/blob/master/code-of-conduct.md">CNCF Code of Conduct</a>.
 
-<a href="https://meshery.io/community"><img alt="Layer5 Service Mesh Community" src="https://raw.githubusercontent.com/layer5io/meshery-osm/master/img/readme/slack-128.png" style="margin-left:10px;padding-top:5px;" width="110px" align="right" /></a>
+<a href="https://slack.layer5.io"><img alt="Layer5 Service Mesh Community" src="https://raw.githubusercontent.com/layer5io/meshery-osm/master/img/readme/slack-128.png" style="margin-left:10px;padding-top:5px;" width="110px" align="right" /></a>
 
-<a href="http://slack.layer5.io"><img alt="Layer5 Service Mesh Community" src="https://raw.githubusercontent.com/layer5io/meshery-osm/master/img/readme/community.svg" style="margin-right:8px;padding-top:5px;" width="140px" align="left" /></a>
+<a href="https://meshery.io/community"><img alt="Layer5 Service Mesh Community" src="https://raw.githubusercontent.com/layer5io/meshery-osm/master/img/readme/community.svg" style="margin-right:8px;padding-top:5px;" width="140px" align="left" /></a>
 
 <p>
 ✔️ <em><strong>Join</strong></em> any or all of the weekly meetings on the <a href="https://calendar.google.com/calendar/b/1?cid=bGF5ZXI1LmlvX2VoMmFhOWRwZjFnNDBlbHZvYzc2MmpucGhzQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20">community calendar</a>.<br />
