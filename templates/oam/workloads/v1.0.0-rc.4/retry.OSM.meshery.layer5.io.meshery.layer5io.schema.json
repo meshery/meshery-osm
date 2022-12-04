@@ -1,0 +1,88 @@
+{
+ "properties": {
+  "destinations": {
+   "description": "Destinations that the Retry policy is applicable to.",
+   "items": {
+    "properties": {
+     "kind": {
+      "description": "Kind of this destination (must be a service).",
+      "type": "string"
+     },
+     "name": {
+      "description": "Name of this destination.",
+      "type": "string"
+     },
+     "namespace": {
+      "description": "Namespace of this destination.",
+      "type": "string"
+     }
+    },
+    "required": [
+     "kind",
+     "name",
+     "namespace"
+    ],
+    "type": "object"
+   },
+   "type": "array"
+  },
+  "retryPolicy": {
+   "description": "Retry policy that will be applied to the source and destination services",
+   "properties": {
+    "numRetries": {
+     "description": "Maximum number of retries to attempt.",
+     "type": "integer"
+    },
+    "perTryTimeout": {
+     "description": "Time allowed for a retry before it's considered a failed attempt.",
+     "type": "string"
+    },
+    "retryBackoffBaseInterval": {
+     "description": "Base interval for exponential retry backoff. Max interval will be 10 times the base interval.",
+     "type": "string"
+    },
+    "retryOn": {
+     "description": "Policies to retry on (delimited by commas).",
+     "type": "string"
+    }
+   },
+   "required": [
+    "retryOn",
+    "perTryTimeout",
+    "numRetries",
+    "retryBackoffBaseInterval"
+   ],
+   "type": "object"
+  },
+  "source": {
+   "description": "Source the Retry policy is applicable to.",
+   "properties": {
+    "kind": {
+     "description": "Kind of this source (must be a service account).",
+     "type": "string"
+    },
+    "name": {
+     "description": "Name of this source.",
+     "type": "string"
+    },
+    "namespace": {
+     "description": "Namespace of this source.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "name",
+    "namespace"
+   ],
+   "type": "object"
+  }
+ },
+ "required": [
+  "source",
+  "destinations",
+  "retryPolicy"
+ ],
+ "title": "Retry",
+ "type": "object"
+}
