@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/layer5io/meshery-adapter-library/adapter"
 	"github.com/layer5io/meshery-adapter-library/api/grpc"
 	"github.com/layer5io/meshery-osm/build"
@@ -38,6 +39,7 @@ var (
 	serviceName = "osm-adapter"
 	version     = "edge"
 	gitsha      = "none"
+	instanceID  = uuid.NewString()
 )
 
 func main() {
@@ -139,6 +141,11 @@ func registerCapabilities(port string, log logger.Handler) {
 	if err := oam.RegisterTraits(mesheryServerAddress(), serviceAddress()+":"+port); err != nil {
 		log.Info(err.Error())
 	}
+
+	// Register meshmodel components
+	if err := oam.RegisterMeshModelComponents(instanceID, mesheryServerAddress(), serviceAddress(), port); err != nil {
+		log.Info(err.Error())
+	}
 }
 
 func registerDynamicCapabilities(port string, log logger.Handler) {
@@ -174,11 +181,13 @@ func registerWorkloads(port string, log logger.Handler) {
 	for _, crd := range build.CRDnames {
 		log.Info("Generating components for ", crd)
 		if err := adapter.CreateComponents(adapter.StaticCompConfig{
-			URL:     build.GetDefaultURL(crd),
-			Method:  gm,
-			Path:    build.WorkloadPath,
-			DirName: version,
-			Config:  build.NewConfig(version),
+			URL:             build.GetDefaultURL(crd),
+			Method:          gm,
+			OAMPath:         build.WorkloadPath,
+			MeshModelPath:   build.MeshModelPath,
+			MeshModelConfig: build.MeshModelConfig,
+			DirName:         version,
+			Config:          build.NewConfig(version),
 		}); err != nil {
 			log.Error(err)
 			return
