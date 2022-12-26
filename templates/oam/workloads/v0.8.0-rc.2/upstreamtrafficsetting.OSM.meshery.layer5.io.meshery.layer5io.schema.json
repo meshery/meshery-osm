@@ -1,0 +1,772 @@
+{
+ "properties": {
+  "connectionSettings": {
+   "description": "Connection settings for the upstream host.",
+   "properties": {
+    "http": {
+     "description": "HTTP connection settings.",
+     "properties": {
+      "maxPendingRequests": {
+       "description": "Maximum number of pending HTTP/1.1 requests allowed.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxRequests": {
+       "description": "Maximum number of parallel HTTP requests allowed.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxRequestsPerConnection": {
+       "description": "Maximum number of HTTP requests per connection allowed.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxRetries": {
+       "description": "Maximum number of parallel retries allowed.",
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    },
+    "tcp": {
+     "description": "TCP connection settings.",
+     "properties": {
+      "connectTimeout": {
+       "description": "TCP connection timeout.",
+       "type": "string"
+      },
+      "maxConnections": {
+       "description": "Maximum number of TCP connections.",
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "type": "object"
+  },
+  "host": {
+   "description": "Upstream host the policy is applicabe to.",
+   "type": "string"
+  },
+  "httpRoutes": {
+   "description": "HTTPRoutes defines the list of HTTP routes settings for the upstream host. Settings are applied at a per route level.",
+   "items": {
+    "description": "HTTP route settings for the given path.",
+    "properties": {
+     "path": {
+      "description": "Path defines the HTTP path. This can be an RE2 regex value.",
+      "minLength": 1,
+      "type": "string"
+     },
+     "rateLimit": {
+      "description": "Rate limiting policy applied per route.",
+      "properties": {
+       "global": {
+        "description": "Global rate limiting policy applied per route.",
+        "properties": {
+         "descriptors": {
+          "description": "List of rate limit descriptors to use in the rate limit service request.",
+          "items": {
+           "description": "Rate limit descriptor to use in the rate limit service request.",
+           "properties": {
+            "entries": {
+             "description": "List of rate limit descriptor entries for the descriptor.",
+             "items": {
+              "description": "Descriptor entry.",
+              "oneOf": [
+               {
+                "required": [
+                 "genericKey"
+                ]
+               },
+               {
+                "required": [
+                 "remoteAddress"
+                ]
+               },
+               {
+                "required": [
+                 "requestHeader"
+                ]
+               },
+               {
+                "required": [
+                 "headerValueMatch"
+                ]
+               }
+              ],
+              "properties": {
+               "genericKey": {
+                "description": "GenericKey (optional) defines a descriptor entry with a static key-value pair.",
+                "properties": {
+                 "key": {
+                  "description": "Key (optional) of the genericKey descriptor entry. Defaults to 'generic_key'.",
+                  "minLength": 1,
+                  "type": "string"
+                 },
+                 "value": {
+                  "description": "Value of the genericKey descriptor entry",
+                  "minLength": 1,
+                  "type": "string"
+                 }
+                },
+                "required": [
+                 "value"
+                ],
+                "type": "object"
+               },
+               "headerValueMatch": {
+                "description": "HeaderValueMatch (optional) defines a descriptor entry that is generated when the request header matches the given HTTP header match criteria.",
+                "properties": {
+                 "expectMatch": {
+                  "description": "ExpectMatch (optional) defines whether the request must match the given match criteria for the descriptor entry to be generated. If set to false, a descriptor entry will be generated when the request does not match the match criteria. Defaults to true.",
+                  "type": "boolean"
+                 },
+                 "headers": {
+                  "description": "List of HTTP header match criteria used to determine whether the descriptor entry should be generated for the request. A match will happen if all the specified headers are present in the request with the same values, or based on presence if the value field is not set.",
+                  "items": {
+                   "description": "Header match criteria.",
+                   "oneOf": [
+                    {
+                     "required": [
+                      "name",
+                      "exact"
+                     ]
+                    },
+                    {
+                     "required": [
+                      "name",
+                      "prefix"
+                     ]
+                    },
+                    {
+                     "required": [
+                      "name",
+                      "suffix"
+                     ]
+                    },
+                    {
+                     "required": [
+                      "name",
+                      "regex"
+                     ]
+                    },
+                    {
+                     "required": [
+                      "name",
+                      "contains"
+                     ]
+                    },
+                    {
+                     "required": [
+                      "name",
+                      "present"
+                     ]
+                    }
+                   ],
+                   "properties": {
+                    "contains": {
+                     "description": "Contains (optional) value to match against the given header name.",
+                     "minLength": 1,
+                     "type": "string"
+                    },
+                    "exact": {
+                     "description": "Exact (optional) value to match against the given header name.",
+                     "minLength": 1,
+                     "type": "string"
+                    },
+                    "name": {
+                     "description": "Name of the header to match.",
+                     "minLength": 1,
+                     "type": "string"
+                    },
+                    "prefix": {
+                     "description": "Prefix (optional) value to match against the given header name.",
+                     "minLength": 1,
+                     "type": "string"
+                    },
+                    "present": {
+                     "description": "Present (optional) defines whether the request matches the criteria when the header is present. If set to false, header match will be performed based on whether the header is absent.",
+                     "type": "boolean"
+                    },
+                    "regex": {
+                     "description": "Regex (optional) value to match against the given header name.",
+                     "minLength": 1,
+                     "type": "string"
+                    },
+                    "suffix": {
+                     "description": "Suffix (optional) value to match against the given header name.",
+                     "minLength": 1,
+                     "type": "string"
+                    }
+                   },
+                   "required": [
+                    "name"
+                   ],
+                   "type": "object"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                 },
+                 "key": {
+                  "description": "Key (optional) of the headerValueMatch descriptor entry. Defaults to 'header_match'.",
+                  "type": "string"
+                 },
+                 "value": {
+                  "description": "Value of the headerValueMatch descriptor entry",
+                  "minLength": 1,
+                  "type": "string"
+                 }
+                },
+                "required": [
+                 "value",
+                 "headers"
+                ],
+                "type": "object"
+               },
+               "remoteAddress": {
+                "description": "RemoteAddress (optional) defines a descriptor entry with with key 'remote_address' and value equal to the client's IP address derived from the x-forwarded-for header.",
+                "type": "object"
+               },
+               "requestHeader": {
+                "description": "RequestHeader (optional) defines a descriptor entry that is generated only when the request header matches the given header name. The value of the descriptor entry is derived from the value of the header present in the request.",
+                "properties": {
+                 "key": {
+                  "description": "Key of the requestHeader descriptor entry.",
+                  "minLength": 1,
+                  "type": "string"
+                 },
+                 "name": {
+                  "description": "Name of the header used to look up the descriptor entry's value.",
+                  "minLength": 1,
+                  "type": "string"
+                 }
+                },
+                "required": [
+                 "name",
+                 "key"
+                ],
+                "type": "object"
+               }
+              },
+              "type": "object"
+             },
+             "minItems": 1,
+             "type": "array"
+            }
+           },
+           "required": [
+            "entries"
+           ],
+           "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+         }
+        },
+        "required": [
+         "descriptors"
+        ],
+        "type": "object"
+       },
+       "local": {
+        "description": "Local rate limiting policy applied per route.",
+        "properties": {
+         "burst": {
+          "description": "Burst (optional) defines the number of requests above the baseline rate that are allowed in a short period of time.",
+          "type": "integer"
+         },
+         "requests": {
+          "description": "Requests defines the number of requests allowed per unit of time before rate limiting occurs.",
+          "minimum": 1,
+          "type": "integer"
+         },
+         "responseHeadersToAdd": {
+          "description": "ResponseHeadersToAdd (optional) defines the list of HTTP headers that should be added to each response for requests that have been rate limited.",
+          "items": {
+           "description": "Defines an HTTP header name/value pair.",
+           "properties": {
+            "name": {
+             "description": "Name defines the HTTP header name.",
+             "minLength": 1,
+             "type": "string"
+            },
+            "value": {
+             "description": "Value defines the HTTP header value.",
+             "minLength": 1,
+             "type": "string"
+            }
+           },
+           "required": [
+            "name",
+            "value"
+           ],
+           "type": "object"
+          },
+          "type": "array"
+         },
+         "responseStatusCode": {
+          "description": "ResponseStatusCode (optional) defines the HTTP status code to use for responses to rate limited requests. Code must be in the 400-599 (inclusive) error range. If not specified, a default of 429 (Too Many Requests) is used.",
+          "maximum": 599,
+          "minimum": 400,
+          "type": "integer"
+         },
+         "unit": {
+          "description": "Unit defines the period of time within which requests over the limit will be rate limited. Valid values are \"second\", \"minute\" and \"hour\".",
+          "enum": [
+           "second",
+           "minute",
+           "hour"
+          ],
+          "type": "string"
+         }
+        },
+        "type": "object"
+       }
+      },
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "type": "array"
+  },
+  "rateLimit": {
+   "description": "Rate limiting policy.",
+   "properties": {
+    "global": {
+     "description": "Global rate limit policy responsible for rate limiting traffic to the upstream service.",
+     "properties": {
+      "http": {
+       "description": "Global rate limit policy for HTTP requests.",
+       "properties": {
+        "descriptors": {
+         "description": "List of rate limit descriptors to use in the rate limit service request.",
+         "items": {
+          "description": "Rate limit descriptor to use in the rate limit service request.",
+          "properties": {
+           "entries": {
+            "description": "List of rate limit descriptor entries for the descriptor.",
+            "items": {
+             "description": "Descriptor entry.",
+             "oneOf": [
+              {
+               "required": [
+                "genericKey"
+               ]
+              },
+              {
+               "required": [
+                "remoteAddress"
+               ]
+              },
+              {
+               "required": [
+                "requestHeader"
+               ]
+              },
+              {
+               "required": [
+                "headerValueMatch"
+               ]
+              }
+             ],
+             "properties": {
+              "genericKey": {
+               "description": "GenericKey (optional) defines a descriptor entry with a static key-value pair.",
+               "properties": {
+                "key": {
+                 "description": "Key (optional) of the genericKey descriptor entry. Defaults to 'generic_key'.",
+                 "minLength": 1,
+                 "type": "string"
+                },
+                "value": {
+                 "description": "Value of the genericKey descriptor entry",
+                 "minLength": 1,
+                 "type": "string"
+                }
+               },
+               "required": [
+                "value"
+               ],
+               "type": "object"
+              },
+              "headerValueMatch": {
+               "description": "HeaderValueMatch (optional) defines a descriptor entry that is generated when the request header matches the given HTTP header match criteria.",
+               "properties": {
+                "expectMatch": {
+                 "description": "ExpectMatch (optional) defines whether the request must match the given match criteria for the descriptor entry to be generated. If set to false, a descriptor entry will be generated when the request does not match the match criteria. Defaults to true.",
+                 "type": "boolean"
+                },
+                "headers": {
+                 "description": "List of HTTP header match criteria used to determine whether the descriptor entry should be generated for the request. A match will happen if all the specified headers are present in the request with the same values, or based on presence if the value field is not set.",
+                 "items": {
+                  "description": "Header match criteria.",
+                  "oneOf": [
+                   {
+                    "required": [
+                     "name",
+                     "exact"
+                    ]
+                   },
+                   {
+                    "required": [
+                     "name",
+                     "prefix"
+                    ]
+                   },
+                   {
+                    "required": [
+                     "name",
+                     "suffix"
+                    ]
+                   },
+                   {
+                    "required": [
+                     "name",
+                     "regex"
+                    ]
+                   },
+                   {
+                    "required": [
+                     "name",
+                     "contains"
+                    ]
+                   },
+                   {
+                    "required": [
+                     "name",
+                     "present"
+                    ]
+                   }
+                  ],
+                  "properties": {
+                   "contains": {
+                    "description": "Contains (optional) value to match against the given header name.",
+                    "minLength": 1,
+                    "type": "string"
+                   },
+                   "exact": {
+                    "description": "Exact (optional) value to match against the given header name.",
+                    "minLength": 1,
+                    "type": "string"
+                   },
+                   "name": {
+                    "description": "Name of the header to match.",
+                    "minLength": 1,
+                    "type": "string"
+                   },
+                   "prefix": {
+                    "description": "Prefix (optional) value to match against the given header name.",
+                    "minLength": 1,
+                    "type": "string"
+                   },
+                   "present": {
+                    "description": "Present (optional) defines whether the request matches the criteria when the header is present. If set to false, header match will be performed based on whether the header is absent.",
+                    "type": "boolean"
+                   },
+                   "regex": {
+                    "description": "Regex (optional) value to match against the given header name.",
+                    "minLength": 1,
+                    "type": "string"
+                   },
+                   "suffix": {
+                    "description": "Suffix (optional) value to match against the given header name.",
+                    "minLength": 1,
+                    "type": "string"
+                   }
+                  },
+                  "required": [
+                   "name"
+                  ],
+                  "type": "object"
+                 },
+                 "minItems": 1,
+                 "type": "array"
+                },
+                "key": {
+                 "description": "Key (optional) of the headerValueMatch descriptor entry. Defaults to 'header_match'.",
+                 "type": "string"
+                },
+                "value": {
+                 "description": "Value of the headerValueMatch descriptor entry",
+                 "minLength": 1,
+                 "type": "string"
+                }
+               },
+               "required": [
+                "value",
+                "headers"
+               ],
+               "type": "object"
+              },
+              "remoteAddress": {
+               "description": "RemoteAddress (optional) defines a descriptor entry with with key 'remote_address' and value equal to the client's IP address derived from the x-forwarded-for header.",
+               "type": "object"
+              },
+              "requestHeader": {
+               "description": "RequestHeader (optional) defines a descriptor entry that is generated only when the request header matches the given header name. The value of the descriptor entry is derived from the value of the header present in the request.",
+               "properties": {
+                "key": {
+                 "description": "Key of the requestHeader descriptor entry.",
+                 "minLength": 1,
+                 "type": "string"
+                },
+                "name": {
+                 "description": "Name of the header used to look up the descriptor entry's value.",
+                 "minLength": 1,
+                 "type": "string"
+                }
+               },
+               "required": [
+                "name",
+                "key"
+               ],
+               "type": "object"
+              }
+             },
+             "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+           }
+          },
+          "required": [
+           "entries"
+          ],
+          "type": "object"
+         },
+         "minItems": 1,
+         "type": "array"
+        },
+        "domain": {
+         "description": "Domain defines a container for a set of rate limits. All domains known to the Ratelimit service must be globally unique. They serve as a way to have different rate limit configurations that don't conflict.",
+         "type": "string"
+        },
+        "enableXRateLimitHeaders": {
+         "description": "EnableXRateLimitHeaders (optional) defines whether to include the headers X-RateLimit-Limit, X-RateLimit-Remaining, and X-RateLimit-Reset on responses to clients when the rate limit service is consulted for a request. Defaults to false.",
+         "type": "boolean"
+        },
+        "failOpen": {
+         "description": "FailOpen (optional) defines whether to allow traffic in case of communication failure between rate limiting service and the proxy. Defaults to true.",
+         "type": "boolean"
+        },
+        "rateLimitService": {
+         "description": "Rate limit service to use as a global rate limiter.",
+         "properties": {
+          "host": {
+           "description": "Hostname of the global rate limit service.",
+           "minLength": 1,
+           "type": "string"
+          },
+          "port": {
+           "description": "Port of the global rate limit service.",
+           "maximum": 65535,
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "host",
+          "port"
+         ],
+         "type": "object"
+        },
+        "responseStatusCode": {
+         "description": "ResponseStatusCode (optional) defines the HTTP status code to use for responses to rate limited requests. Code must be in the 400-599 (inclusive) error range. If not specified, a default of 429 (Too Many Requests) is used.",
+         "maximum": 599,
+         "minimum": 400,
+         "type": "integer"
+        },
+        "timeout": {
+         "description": "Timeout (optional) interval for calls to the rate limit service. Defaults to 20ms.",
+         "type": "string"
+        }
+       },
+       "required": [
+        "rateLimitService",
+        "domain"
+       ],
+       "type": "object"
+      },
+      "tcp": {
+       "description": "Global rate limit policy for TCP connections.",
+       "properties": {
+        "descriptors": {
+         "description": "List of rate limit descriptors to use in the rate limit service request.",
+         "items": {
+          "description": "Rate limit descriptor to use in the rate limit service request.",
+          "properties": {
+           "entries": {
+            "description": "List of rate limit descriptor entries for the descriptor.",
+            "items": {
+             "description": "Descriptor entry.",
+             "properties": {
+              "key": {
+               "description": "Key of the descriptor entry.",
+               "type": "string"
+              },
+              "value": {
+               "description": "Value of the descriptor entry.",
+               "type": "string"
+              }
+             },
+             "required": [
+              "key",
+              "value"
+             ],
+             "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+           }
+          },
+          "required": [
+           "entries"
+          ],
+          "type": "object"
+         },
+         "minItems": 1,
+         "type": "array"
+        },
+        "domain": {
+         "description": "Domain defines a container for a set of rate limits. All domains known to the Ratelimit service must be globally unique. They serve as a way to have different rate limit configurations that don't conflict.",
+         "type": "string"
+        },
+        "failOpen": {
+         "description": "FailOpen (optional) defines whether to allow traffic in case of communication failure between rate limiting service and the proxy. Defaults to true.",
+         "type": "boolean"
+        },
+        "rateLimitService": {
+         "description": "Rate limit service to use as a global rate limiter.",
+         "properties": {
+          "host": {
+           "description": "Hostname of the global rate limit service.",
+           "minLength": 1,
+           "type": "string"
+          },
+          "port": {
+           "description": "Port of the global rate limit service.",
+           "maximum": 65535,
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "host",
+          "port"
+         ],
+         "type": "object"
+        },
+        "timeout": {
+         "description": "Timeout (optional) interval for calls to the rate limit service. Defaults to 20ms.",
+         "type": "string"
+        }
+       },
+       "required": [
+        "rateLimitService",
+        "domain",
+        "descriptors"
+       ],
+       "type": "object"
+      }
+     },
+     "type": "object"
+    },
+    "local": {
+     "description": "Local rate limit policy responsible for rate limiting traffic at the upstream service.",
+     "properties": {
+      "http": {
+       "description": "HTTP level local rate limiting to limit the number of requests per unit of time.",
+       "properties": {
+        "burst": {
+         "description": "Burst (optional) defines the number of requests above the baseline rate that are allowed in a short period of time.",
+         "type": "integer"
+        },
+        "requests": {
+         "description": "Requests defines the number of requests allowed per unit of time before rate limiting occurs.",
+         "minimum": 1,
+         "type": "integer"
+        },
+        "responseHeadersToAdd": {
+         "description": "ResponseHeadersToAdd (optional) defines the list of HTTP headers that should be added to each response for requests that have been rate limited.",
+         "items": {
+          "description": "Defines an HTTP header name/value pair.",
+          "properties": {
+           "name": {
+            "description": "Name defines the HTTP header name.",
+            "minLength": 1,
+            "type": "string"
+           },
+           "value": {
+            "description": "Value defines the HTTP header value.",
+            "minLength": 1,
+            "type": "string"
+           }
+          },
+          "required": [
+           "name",
+           "value"
+          ],
+          "type": "object"
+         },
+         "type": "array"
+        },
+        "responseStatusCode": {
+         "description": "ResponseStatusCode (optional) defines the HTTP status code to use for responses to rate limited requests. Code must be in the 400-599 (inclusive) error range. If not specified, a default of 429 (Too Many Requests) is used.",
+         "maximum": 599,
+         "minimum": 400,
+         "type": "integer"
+        },
+        "unit": {
+         "description": "Unit defines the period of time within which requests over the limit will be rate limited. Valid values are \"second\", \"minute\" and \"hour\".",
+         "enum": [
+          "second",
+          "minute",
+          "hour"
+         ],
+         "type": "string"
+        }
+       },
+       "type": "object"
+      },
+      "tcp": {
+       "description": "TCP level local rate limiting to limit the number of connections per unit of time.",
+       "properties": {
+        "burst": {
+         "description": "Burst (optional) defines the number of connections above the baseline rate that are allowed in a short period of time.",
+         "type": "integer"
+        },
+        "connections": {
+         "description": "Connections defines the number of connections allowed per unit of time before rate limiting occurs.",
+         "minimum": 1,
+         "type": "integer"
+        },
+        "unit": {
+         "description": "Unit defines the period of time within which connections over the limit will be rate limited. Valid values are \"second\", \"minute\" and \"hour\".",
+         "enum": [
+          "second",
+          "minute",
+          "hour"
+         ],
+         "type": "string"
+        }
+       },
+       "type": "object"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "type": "object"
+  }
+ },
+ "required": [
+  "host"
+ ],
+ "title": "Upstream Traffic Setting",
+ "type": "object"
+}
