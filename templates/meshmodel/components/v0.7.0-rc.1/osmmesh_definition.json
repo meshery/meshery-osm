@@ -1,1 +1,1 @@
-{"kind":"WorkloadDefinition","apiVersion":"core.oam.dev/v1alpha1","display-name":"","format":"","metadata":{"creationTimestamp":null,"name":"OSMMesh"},"model":{"name":"","version":"v0.7.0-rc.1","display-name":"","category":"","sub-category":""},"schema":""}
+{"kind":"WorkloadDefinition","apiVersion":"core.oam.dev/v1alpha1","displayName":"","format":"","metadata":{"creationTimestamp":null,"name":"OSMMesh"},"model":{"name":"","version":"v0.7.0-rc.1","displayName":"","category":"","subCategory":""},"schema":""}
