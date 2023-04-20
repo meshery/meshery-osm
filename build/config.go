@@ -18,7 +18,6 @@ import (
 
 var DefaultGenerationMethod string
 var LatestVersion string
-var WorkloadPath string
 var MeshModelPath string
 var CRDnames []string
 var OverrideURL string
@@ -26,11 +25,9 @@ var AllVersions []string
 
 const Component = "OSM"
 
-var meshmodelmetadata = make(map[string]interface{})
-
 var MeshModelConfig = adapter.MeshModelConfig{ //Move to build/config.go
-	Category: "Orchestration & Management",
-	Metadata: meshmodelmetadata,
+	Category: "Cloud Native Network",
+	Metadata: map[string]interface{}{},
 }
 
 // NewConfig creates the configuration for creating components
@@ -68,8 +65,7 @@ func init() {
 	}()
 	byt, _ := io.ReadAll(f)
 
-	_ = json.Unmarshal(byt, &meshmodelmetadata)
-	WorkloadPath = filepath.Join(wd, "templates", "oam", "workloads")
+	_ = json.Unmarshal(byt, &MeshModelConfig.Metadata)
 	MeshModelPath = filepath.Join(wd, "templates", "meshmodel", "components")
 	AllVersions, _ = utils.GetLatestReleaseTagsSorted("openservicemesh", "osm")
 	if len(AllVersions) == 0 {
