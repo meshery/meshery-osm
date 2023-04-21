@@ -14,7 +14,7 @@
 	"model": {
 		"name": "OPEN_SERVICE_MESH",
 		"version": "v1.2.4",
-		"displayName": "OPEN_SERVICE_MESH",
+		"displayName": "Open Service Mesh",
 		"category": {
 			"name": "Cloud Native Network",
 			"metadata": null
