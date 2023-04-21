@@ -18,14 +18,7 @@ var (
 
 // AvailableVersions denote the component versions available statically
 var AvailableVersions = map[string]bool{}
-var pathSets []schemaDefinitionPathSet
 var availableVersionGlobalMutex sync.Mutex
-
-type schemaDefinitionPathSet struct {
-	oamDefinitionPath string
-	jsonSchemaPath    string
-	name              string
-}
 
 type meshmodelDefinitionPathSet struct {
 	meshmodelDefinitionPath string
