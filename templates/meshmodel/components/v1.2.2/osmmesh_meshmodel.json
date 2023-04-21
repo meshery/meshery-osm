@@ -16,9 +16,9 @@
     {
         "name": "OPEN_SERVICE_MESH",
         "version": "v1.2.2",
-        "displayName": "OPEN_SERVICE_MESH",
+        "displayName": "Open Service Mesh",
         "category": {
-			"name": "Orchestration \u0026 Management",
+			"name": "Cloud Native Network",
 			"metadata": null
 		},
         "subCategory": "Service Mesh"

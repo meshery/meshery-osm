@@ -1,1 +1,0 @@
-{"kind":"WorkloadDefinition","apiVersion":"core.oam.dev/v1alpha1","displayName":"","format":"","metadata":{"creationTimestamp":null,"name":"OSMMesh"},"model":{"name":"","version":"v1.1.0","displayName":"","category":"","subCategory":""},"schema":""}
