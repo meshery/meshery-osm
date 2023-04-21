@@ -1,4 +1,0 @@
-{"kind":"WorkloadDefinition","apiVersion":"core.oam.dev/v1alpha1","displayName":"","format":"","metadata":{"creationTimestamp":null,"name":"OSMMesh"},"model":{"name":"","version":"v0.9.0-rc.2","displayName":"","category": {
-			"name": "Cloud Native Network",
-			"metadata": null
-		},"subCategory":""},"schema":""}
