@@ -16,7 +16,7 @@ newPRWelcomeComment: >
 # Comment to be posted to on pull requests merged by a first time user
 firstPRMergeComment: >
   Thanks for your contribution to the Layer5 community! :tada:
-  
+ 
   <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github\welcome\meshery_logo_dark.svg">
   <source media="(prefers-color-scheme: light)" srcset=".github\welcome\meshery_logo_light.svg">
