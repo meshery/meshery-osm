@@ -55,7 +55,3 @@ yarn.lock
 **errorutil_analyze_summary.json
 **errorutil_errors_export.json
 
-[alias]
-  amend = commit -s --amend
-  cm = commit -s -m
-  commit = commit -s
