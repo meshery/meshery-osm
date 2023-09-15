@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.19 as build-env
+FROM golang:1.21 as build-env
 ARG VERSION
 ARG GIT_COMMITSHA
 WORKDIR /github.com/layer5io/meshery-osm
