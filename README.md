@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> Open Service Mesh is an archived project. Consequently, the Meshery Adapter for OSM is an archived adapter.
+
+
 <p style="text-align:center;" align="center"><a href="https://layer5.io/meshery"><picture align="center">
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/meshery/meshery/master/.github/assets/images/meshery/meshery-logo-dark-text-side.svg"  width="70%" align="center" style="margin-bottom:20px;">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/meshery/meshery/master/.github/assets/images/meshery/meshery-logo-light-text-side.svg" width="70%" align="center" style="margin-bottom:20px;">
